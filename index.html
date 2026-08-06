@@ -176,15 +176,79 @@
         html[data-theme="dark"] .theme-icon-moon { display: none; }
         html[data-theme="light"] .theme-icon-sun { display: none; }
 
-        .sidebar-body {
+        /* ============================================================
+           SEKMELER
+           ============================================================ */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            padding: 8px 10px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex: 0 0 auto;
+        }
+
+        .tab {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 6px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            background: none;
+            color: var(--muted);
+            font: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .16s ease;
+        }
+        .tab:hover { background: var(--surface-2); color: var(--text); }
+        .tab:focus-visible { outline: none; box-shadow: var(--ring); }
+        .tab svg { width: 15px; height: 15px; }
+        .tab.is-active {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-color: color-mix(in srgb, var(--primary) 24%, transparent);
+        }
+
+        .tab-count {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 99px;
+            background: color-mix(in srgb, var(--primary) 16%, transparent);
+            color: var(--primary);
+        }
+        .tab.is-active .tab-count { background: color-mix(in srgb, var(--primary) 26%, transparent); }
+
+        .tab-panel {
+            display: none;
             flex: 1;
             min-height: 0;
-            display: flex;
             flex-direction: column;
             gap: 12px;
             padding: 14px;
             overflow-y: auto;
         }
+        .tab-panel.is-active { display: flex; }
+        /* Kartlar sığmadığında ezilmesin, panel kaysın */
+        .tab-panel > * { flex: 0 0 auto; }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 2px 0 -4px;
+        }
+        .panel-title svg { width: 14px; height: 14px; }
 
         /* ============================================================
            ADIM KARTLARI
@@ -481,11 +545,8 @@
            SONUÇ LİSTESİ
            ============================================================ */
         .results-card {
-            flex: 1;
-            min-height: 280px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .search-wrap { position: relative; margin-bottom: 10px; }
@@ -511,10 +572,6 @@
         .search-wrap input:focus { outline: none; border-color: var(--primary); box-shadow: var(--ring); }
 
         #results {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding-right: 4px;
             display: flex;
             flex-direction: column;
             gap: 7px;
@@ -623,11 +680,162 @@
             white-space: nowrap;
         }
         .pill-neutral { --pc: var(--muted); }
+        .pill-warn { --pc: var(--warning); }
+        .pill-manual { --pc: var(--primary); }
         .pill-dot {
             width: 6px; height: 6px;
             border-radius: 50%;
             background: currentColor;
         }
+
+        /* ============================================================
+           DÜZENLEME (MANUEL ATAMA)
+           ============================================================ */
+        .hub-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .hub-card + .hub-card { margin-top: 0; }
+
+        .hub-head {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 12px;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+        .hub-head:hover { background: var(--surface-3); }
+
+        .hub-dot {
+            width: 14px; height: 14px;
+            flex: 0 0 14px;
+            border-radius: 50%;
+            border: 2px solid var(--surface);
+            box-shadow: 0 0 0 1px var(--border-strong);
+        }
+        .hub-name { flex: 1; font-size: 12.5px; font-weight: 650; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .hub-load { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+
+        .hub-people { padding: 6px; display: flex; flex-direction: column; gap: 5px; }
+        .hub-empty { padding: 12px; font-size: 11.5px; color: var(--muted); text-align: center; }
+
+        .person-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 9px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface-2);
+            font: inherit;
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            transition: .15s ease;
+        }
+        .person-row:hover { border-color: var(--primary); background: var(--primary-soft); }
+        .person-row:focus-visible { outline: none; box-shadow: var(--ring); }
+        .person-row.is-open { border-color: var(--primary); background: var(--primary-soft); }
+        .person-row .chevron { flex: 0 0 15px; transform: rotate(-90deg); }
+        .person-row.is-open .chevron { transform: rotate(0deg); }
+
+        .person-main { flex: 1; min-width: 0; }
+        .person-name { font-size: 12px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .person-sub {
+            font-size: 11px;
+            color: var(--muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 1px;
+        }
+
+        .alt-panel {
+            border: 1px dashed var(--border-strong);
+            border-radius: var(--radius);
+            background: var(--surface-2);
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .alt-title {
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 2px 2px 4px;
+        }
+
+        .alt-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 9px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface);
+            font: inherit;
+            font-size: 11.5px;
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            transition: .14s ease;
+        }
+        .alt-row:hover { border-color: var(--primary); background: var(--primary-soft); transform: translateX(2px); }
+        .alt-row:focus-visible { outline: none; box-shadow: var(--ring); }
+        .alt-row.is-current { border-color: var(--success); background: var(--success-soft); cursor: default; }
+        .alt-row.is-current:hover { transform: none; }
+        .alt-row.is-full { border-style: dashed; }
+
+        .alt-rank {
+            width: 20px; height: 20px;
+            flex: 0 0 20px;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            font-size: 10px;
+            font-weight: 700;
+            background: var(--surface-3);
+            color: var(--muted);
+        }
+        .alt-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+        .alt-dist { font-variant-numeric: tabular-nums; color: var(--text-soft); white-space: nowrap; }
+
+        /* ============================================================
+           AYARLAR
+           ============================================================ */
+        .setting-block {
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 11px 12px;
+        }
+        .setting-block + .setting-block { margin-top: 10px; }
+        .setting-title { font-size: 12.5px; font-weight: 650; margin-bottom: 3px; }
+        .setting-desc { font-size: 11px; color: var(--muted); line-height: 1.45; margin-bottom: 9px; }
+
+        .btn-danger {
+            background: var(--danger-soft);
+            color: var(--danger);
+            border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+            box-shadow: none;
+        }
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+        }
+        html[data-theme="dark"] .btn-danger { color: var(--danger); }
+        html[data-theme="dark"] .btn-danger:hover { color: #10131c; }
 
         /* ============================================================
            LEJANT
@@ -803,9 +1011,8 @@
                 border-top: 1px solid var(--border);
             }
             .sidebar-head { position: sticky; top: 0; z-index: 5; }
-            .sidebar-body { overflow: visible; }
-            .results-card { min-height: 0; }
-            #results { max-height: 62vh; }
+            .tabs { position: sticky; top: 77px; z-index: 5; }
+            .tab-panel { overflow: visible; }
             .map-legend { left: 10px; bottom: 14px; }
         }
 
@@ -834,17 +1041,117 @@
         </button>
     </header>
 
-    <div class="sidebar-body scroll">
+    <nav class="tabs" role="tablist">
+        <button type="button" class="tab is-active" id="tab-assign" role="tab" aria-selected="true" aria-controls="panel-assign" onclick="showTab('assign')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg>
+            Atama
+        </button>
+        <button type="button" class="tab" id="tab-edit" role="tab" aria-selected="false" aria-controls="panel-edit" onclick="showTab('edit')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+            Düzenle
+            <span class="tab-count" id="tab-edit-count">0</span>
+        </button>
+        <button type="button" class="tab" id="tab-settings" role="tab" aria-selected="false" aria-controls="panel-settings" onclick="showTab('settings')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Ayarlar
+        </button>
+    </nav>
 
-        <!-- ADIM 1 — CSV DOSYALARI -->
-        <section class="card" id="card-upload">
-            <button type="button" class="card-head" onclick="toggleCard('card-upload')" aria-expanded="true">
-                <span class="step-badge">1</span>
-                <span class="card-title">CSV Dosyaları</span>
-                <span class="card-hint">Şablon + yükleme</span>
-                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="card-body-wrap"><div class="card-body"><div class="card-body-inner">
+    <!-- ==========================================================
+         SEKME 1 — ATAMA
+         ========================================================== -->
+    <section class="tab-panel is-active scroll" id="panel-assign" role="tabpanel" aria-labelledby="tab-assign">
+
+        <div class="card">
+            <div class="card-body-inner" style="padding-top: 14px;">
+                <div class="capacity-row">
+                    <label class="capacity-label" for="max-capacity">
+                        Eğitmen başına kursiyer
+                        <small>Sektör bazında okul şube limiti</small>
+                    </label>
+                    <div class="stepper">
+                        <button type="button" onclick="stepCapacity(-1)" aria-label="Azalt">−</button>
+                        <input type="number" id="max-capacity" value="2" min="1" max="99" inputmode="numeric">
+                        <button type="button" onclick="stepCapacity(1)" aria-label="Artır">+</button>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn" onclick="runAssignments()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg>
+                        Otomatik Dağıt
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat"><div class="stat-value" id="stat-hires">0</div><div class="stat-label">Personel</div></div>
+            <div class="stat"><div class="stat-value" id="stat-hubs">0</div><div class="stat-label">Okul Şube</div></div>
+            <div class="stat is-primary"><div class="stat-value" id="count">0</div><div class="stat-label">Atanan</div></div>
+            <div class="stat"><div class="stat-value" id="stat-distance">—</div><div class="stat-label">Ort. km</div></div>
+        </div>
+
+        <div class="card results-card">
+            <div class="card-head" style="cursor: default;">
+                <span class="step-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+                </span>
+                <span class="card-title">Sonuçlar</span>
+                <button class="btn btn-green btn-small" onclick="exportCSV()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+                    Listeyi İndir
+                </button>
+            </div>
+            <div class="card-body-inner">
+                <div class="search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <input type="search" id="result-search" placeholder="Personel, şube veya sektör ara..." oninput="filterResults(this.value)">
+                </div>
+
+                <div id="results">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M9 3v4a2 2 0 0 0 2 2h4"/><path d="m14 4 7 7"/></svg>
+                        <p>Sonuçlar burada görünecek</p>
+                        <small>Önce Ayarlar sekmesinden CSV dosyalarını yükleyin</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ==========================================================
+         SEKME 2 — DÜZENLE (MANUEL ATAMA)
+         ========================================================== -->
+    <section class="tab-panel scroll" id="panel-edit" role="tabpanel" aria-labelledby="tab-edit">
+
+        <div class="notice">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex:0 0 16px;"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <div>Bir katılımcıya tıklayın, alternatif okul şubeler <b>en yakından en uzağa</b> sıralanır. Seçtiğinizde atama, harita ve indirilecek liste anında güncellenir.</div>
+        </div>
+
+        <div class="search-wrap" style="margin-bottom: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="editor-search" placeholder="Katılımcı veya okul şube ara..." oninput="renderEditor()">
+        </div>
+
+        <div id="editor"></div>
+
+    </section>
+
+    <!-- ==========================================================
+         SEKME 3 — AYARLAR
+         ========================================================== -->
+    <section class="tab-panel scroll" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings">
+
+        <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            CSV Dosyaları
+        </div>
+
+        <div class="card">
+            <div class="card-body-inner" style="padding-top: 14px;">
 
                 <div class="file-spec">
                     <div class="file-spec-top">
@@ -896,77 +1203,87 @@
                     <div class="legend-row"><span class="legend-dot" style="background: var(--sector-kobi); color: var(--sector-kobi);"></span>KOBİ okul şubesi</div>
                 </div>
 
-            </div></div></div>
-        </section>
+            </div>
+        </div>
 
-        <!-- ADIM 2 — KAPASİTE -->
-        <section class="card" id="card-capacity">
-            <button type="button" class="card-head" onclick="toggleCard('card-capacity')" aria-expanded="true">
-                <span class="step-badge">2</span>
-                <span class="card-title">Kapasite &amp; Dağıtım</span>
-                <span class="card-hint">Eğitmen limiti</span>
-                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="card-body-wrap"><div class="card-body"><div class="card-body-inner">
+        <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1zM10 12h4"/></svg>
+            Yedekleme
+        </div>
 
-                <div class="capacity-row">
-                    <label class="capacity-label" for="max-capacity">
-                        Eğitmen başına kursiyer
-                        <small>Sektör bazında okul şube limiti</small>
-                    </label>
-                    <div class="stepper">
-                        <button type="button" onclick="stepCapacity(-1)" aria-label="Azalt">−</button>
-                        <input type="number" id="max-capacity" value="2" min="1" max="99" inputmode="numeric">
-                        <button type="button" onclick="stepCapacity(1)" aria-label="Artır">+</button>
+        <div class="card">
+            <div class="card-body-inner" style="padding-top: 14px;">
+
+                <div class="setting-block">
+                    <div class="setting-title">JSON olarak yedekle</div>
+                    <div class="setting-desc">
+                        Yüklü katılımcılar, okul şubeler, kapasite ayarı ve manuel değişiklikler dahil
+                        tüm atamalar tek dosyada saklanır.
                     </div>
-                </div>
-
-                <div class="btn-row">
-                    <button class="btn" onclick="runAssignments()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg>
-                        Otomatik Dağıt
+                    <button class="btn btn-green" onclick="exportJSON()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+                        Yedeği İndir
                     </button>
                 </div>
 
-            </div></div></div>
-        </section>
-
-        <!-- ADIM 3 — SONUÇLAR -->
-        <section class="card results-card" id="card-results">
-            <div class="card-head" style="cursor: default;">
-                <span class="step-badge">3</span>
-                <span class="card-title">Sonuçlar</span>
-                <button class="btn btn-green btn-small" onclick="exportCSV()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
-                    Listeyi İndir
-                </button>
-            </div>
-            <div class="card-body-inner" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
-
-                <div class="stat-grid" style="margin-bottom: 10px;">
-                    <div class="stat"><div class="stat-value" id="stat-hires">0</div><div class="stat-label">Personel</div></div>
-                    <div class="stat"><div class="stat-value" id="stat-hubs">0</div><div class="stat-label">Okul Şube</div></div>
-                    <div class="stat is-primary"><div class="stat-value" id="count">0</div><div class="stat-label">Atanan</div></div>
-                    <div class="stat"><div class="stat-value" id="stat-distance">—</div><div class="stat-label">Ort. km</div></div>
-                </div>
-
-                <div class="search-wrap">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                    <input type="search" id="result-search" placeholder="Personel, şube veya sektör ara..." oninput="filterResults(this.value)">
-                </div>
-
-                <div id="results" class="scroll">
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M9 3v4a2 2 0 0 0 2 2h4"/><path d="m14 4 7 7"/></svg>
-                        <p>Sonuçlar burada görünecek</p>
-                        <small>Önce CSV dosyalarını yükleyin</small>
+                <div class="setting-block">
+                    <div class="setting-title">Yedekten geri yükle</div>
+                    <div class="setting-desc">
+                        Daha önce indirdiğiniz JSON dosyasını seçin; liste, atamalar ve harita
+                        kaldığı yerden geri gelir.
                     </div>
+                    <label class="dropzone" id="json-dropzone" for="json-upload" style="padding: 12px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 9l5-5 5 5M12 4v12"/></svg>
+                        <div class="dropzone-title">JSON dosyası seçin</div>
+                        <div class="dropzone-sub">veya buraya sürükleyin</div>
+                        <input type="file" id="json-upload" accept=".json,application/json" class="visually-hidden">
+                    </label>
+                    <div id="json-status" class="status-text">Henüz yedek yüklenmedi.</div>
                 </div>
 
             </div>
-        </section>
+        </div>
 
-    </div>
+        <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+            Sıfırlama
+        </div>
+
+        <div class="card">
+            <div class="card-body-inner" style="padding-top: 14px;">
+
+                <div class="setting-block">
+                    <div class="setting-title">Katılımcı listesini sıfırla</div>
+                    <div class="setting-desc">Yüklü katılımcılar ve tüm atamalar silinir. Okul şubeler yerinde kalır.</div>
+                    <button class="btn btn-danger" onclick="resetHires()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                        Katılımcıları Sıfırla
+                    </button>
+                </div>
+
+                <div class="setting-block">
+                    <div class="setting-title">Okul şubeleri sıfırla</div>
+                    <div class="setting-desc">Okul şube listesi, harita işaretleri ve atamalar silinir. Katılımcılar kalır.</div>
+                    <button class="btn btn-danger" onclick="resetHubs()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                        Okul Şubeleri Sıfırla
+                    </button>
+                </div>
+
+                <div class="setting-block">
+                    <div class="setting-title">Her şeyi sıfırla</div>
+                    <div class="setting-desc">Ekranı ilk açtığınız hâline döndürür.</div>
+                    <button class="btn btn-danger" onclick="resetAll()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                        Tümünü Sıfırla
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
 </aside>
 
 <main class="map-wrap">
@@ -1183,13 +1500,17 @@ let schoolHubs = [];
 let schoolHubMarkers = [];
 let newHires = [];
 let assignments = [];
+let unassigned = [];
 let lines = [];
+let openPersonKey = null;
 
 const sectorColors = {
     "Gişe": "#f43f5e",
     "Bireysel": "#3b82f6",
     "KOBİ": "#10b981"
 };
+
+const SECTORS = ["Gişe", "Bireysel", "KOBİ"];
 
 // --- ARAYÜZ YARDIMCILARI ---
 const ICONS = {
@@ -1199,7 +1520,9 @@ const ICONS = {
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>',
     pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-    file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'
+    file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+    chevron: '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+    unlink: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.4 10.6 21 8a4 4 0 0 0-5.7-5.7L12.7 5M5.6 13.4 3 16a4 4 0 0 0 5.7 5.7L11.3 19M3 3l18 18"/></svg>'
 };
 
 function toast(message, type = "info", timeout = 4600) {
@@ -1229,20 +1552,27 @@ function setStatus(elementId, html, state) {
     el.innerHTML = html;
 }
 
-function toggleCard(id) {
-    const card = document.getElementById(id);
-    if (!card) return;
+function showTab(name) {
+    ["assign", "edit", "settings"].forEach(key => {
+        const tab = document.getElementById("tab-" + key);
+        const panel = document.getElementById("panel-" + key);
 
-    card.classList.toggle("collapsed");
+        tab.classList.toggle("is-active", key === name);
+        tab.setAttribute("aria-selected", String(key === name));
+        panel.classList.toggle("is-active", key === name);
+    });
 
-    const head = card.querySelector(".card-head");
-    if (head) head.setAttribute("aria-expanded", String(!card.classList.contains("collapsed")));
+    if (name === "edit") renderEditor();
 }
 
 function stepCapacity(delta) {
     const input = document.getElementById("max-capacity");
     const next = Math.min(99, Math.max(1, (parseInt(input.value, 10) || 1) + delta));
     input.value = next;
+}
+
+function getMaxCapacity() {
+    return Math.max(1, parseInt(document.getElementById("max-capacity").value, 10) || 1);
 }
 
 function initials(name) {
@@ -1325,6 +1655,14 @@ function getBranchByName(branchName) {
     return branches.find(b => normalizeText(b.name) === normalizeText(branchName));
 }
 
+function getHubByName(hubName) {
+    return schoolHubs.find(h => normalizeText(h.name) === normalizeText(hubName));
+}
+
+function getHubIndex(hubName) {
+    return schoolHubs.findIndex(h => normalizeText(h.name) === normalizeText(hubName));
+}
+
 function isHeaderRow(row, expectedWords) {
     const joined = row.map(x => normalizeText(x)).join(" ");
     return expectedWords.every(word => joined.includes(normalizeText(word)));
@@ -1343,6 +1681,10 @@ function getDistance(lat1, lon1, lat2, lon2) {
         Math.sin(dLon / 2);
 
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function emptyLoad() {
+    return { "Gişe": 0, "Bireysel": 0, "KOBİ": 0 };
 }
 
 // --- CSV İNDİRME FONKSİYONLARI ---
@@ -1381,10 +1723,10 @@ function downloadSchoolBranchesTemplate() {
 }
 
 function downloadCSVFile(csv, downloadName) {
-    const blob = new Blob(["\uFEFF" + csv], {
-        type: "text/csv;charset=utf-8;"
-    });
+    downloadBlob(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }), downloadName);
+}
 
+function downloadBlob(blob, downloadName) {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = downloadName;
@@ -1411,11 +1753,12 @@ function loadSelectedCSVs() {
     newHires = [];
     schoolHubs = [];
     assignments = [];
+    unassigned = [];
+    openPersonKey = null;
 
-    document.getElementById("count").innerText = "0";
-    document.getElementById("stat-hires").innerText = "0";
-    document.getElementById("stat-hubs").innerText = "0";
-    document.getElementById("stat-distance").innerText = "—";
+    clearAssignmentLines();
+    updateStats();
+
     document.getElementById("results").innerHTML = emptyState("CSV dosyaları okunuyor...", "Lütfen bekleyin");
 
     setStatus("upload-status", "Personel dosyası aranıyor...");
@@ -1563,7 +1906,7 @@ function parseNewHiresRows(rows) {
         }
     });
 
-    document.getElementById("stat-hires").innerText = newHires.length;
+    updateStats();
 
     if (newHires.length === 0) {
         setStatus("upload-status", "Yeni başlayanlar dosyası okundu ama geçerli personel kaydı bulunamadı.", "error");
@@ -1628,15 +1971,11 @@ function parseSchoolHubRows(rows) {
         schoolHubs.push({
             name: branchInfo.name,
             areas: uniqueAreas,
-            loadBySector: {
-                "Gişe": 0,
-                "Bireysel": 0,
-                "KOBİ": 0
-            }
+            loadBySector: emptyLoad()
         });
     });
 
-    document.getElementById("stat-hubs").innerText = schoolHubs.length;
+    updateStats();
 
     let message = `<b>${schoolHubs.length}</b> okul şube yüklendi.`;
     let state = schoolHubs.length > 0 ? "ok" : "error";
@@ -1671,10 +2010,17 @@ function finalizeBulkCSVLoad(recognizedNewHires, recognizedSchoolHubs) {
         toast("Okul şubeleri CSV dosyası tanınamadı.", "error");
     }
 
+    if (recognizedSchoolHubs && schoolHubs.length > 0) {
+        drawSchoolHubMarkers();
+    }
+
+    renderEditor();
+
     if (recognizedNewHires && recognizedSchoolHubs) {
         document.getElementById("results").innerHTML += `
             <div class="notice is-ok">${ICONS.ok}
-                <div>İki CSV dosyası da başarıyla yüklendi. Şimdi <b>Haritada İşaretle</b> butonuna basabilirsin.</div>
+                <div>İki CSV dosyası da yüklendi ve okul şubeler haritada işaretlendi.
+                Şimdi <b>Atama</b> sekmesinden dağıtımı başlatabilirsin.</div>
             </div>
         `;
         toast("İki CSV dosyası da başarıyla yüklendi.", "ok");
@@ -1698,7 +2044,7 @@ function markSchoolBranches() {
     toast(schoolHubs.length + " okul şube haritada işaretlendi.", "ok");
 }
 
-function drawSchoolHubMarkers() {
+function drawSchoolHubMarkers(fit = true) {
     schoolHubMarkers.forEach(marker => map.removeLayer(marker));
     schoolHubMarkers = [];
 
@@ -1713,43 +2059,51 @@ function drawSchoolHubMarkers() {
             zIndexOffset: 1000
         }).addTo(map);
 
-        marker.bindPopup(`
+        marker.bindPopup(() => `
             <div class="popup-title">${escapeHTML(branch.name)}</div>
             <div class="popup-label">Okul şube alanları</div>
-            <div class="popup-areas">
-                ${hub.areas.map(area => sectorPill(area)).join("")}
-            </div>
+            <div class="popup-areas">${hub.areas.map(area => sectorPill(area)).join("")}</div>
+            <div class="popup-label" style="margin-top:8px;">Doluluk</div>
+            <div class="popup-areas">${hub.areas.map(area => hubLoadPill(hub, area)).join("")}</div>
         `);
 
         schoolHubMarkers.push(marker);
     });
 
-    if (schoolHubMarkers.length > 0) {
+    if (fit && schoolHubMarkers.length > 0) {
         const group = L.featureGroup(schoolHubMarkers);
         map.fitBounds(group.getBounds().pad(0.18), { animate: true });
     }
 }
 
 function createSchoolHubIcon(areas) {
-    const colors = areas.map(area => sectorColors[area]).filter(Boolean);
-
-    let background = "#94a3b8";
-
-    if (colors.length === 1) {
-        background = colors[0];
-    } else if (colors.length === 2) {
-        background = `linear-gradient(90deg, ${colors[0]} 0 50%, ${colors[1]} 50% 100%)`;
-    } else if (colors.length >= 3) {
-        background = `conic-gradient(${colors[0]} 0deg 120deg, ${colors[1]} 120deg 240deg, ${colors[2]} 240deg 360deg)`;
-    }
-
     return L.divIcon({
         className: "",
-        html: `<div class="school-marker" style="background:${background};"></div>`,
+        html: `<div class="school-marker" style="background:${hubGradient(areas)};"></div>`,
         iconSize: [18, 18],
         iconAnchor: [9, 9],
         popupAnchor: [0, -13]
     });
+}
+
+function hubGradient(areas) {
+    const colors = (areas || []).map(area => sectorColors[area]).filter(Boolean);
+
+    if (colors.length === 1) return colors[0];
+    if (colors.length === 2) return `linear-gradient(90deg, ${colors[0]} 0 50%, ${colors[1]} 50% 100%)`;
+    if (colors.length >= 3) return `conic-gradient(${colors[0]} 0deg 120deg, ${colors[1]} 120deg 240deg, ${colors[2]} 240deg 360deg)`;
+
+    return "#94a3b8";
+}
+
+function hubLoadPill(hub, sector) {
+    const cap = getMaxCapacity();
+    const load = (hub.loadBySector && hub.loadBySector[sector]) || 0;
+    const cls = load > cap ? "pill-warn" : "";
+
+    return `<span class="pill ${cls}" style="${cls ? "" : `--pc:${sectorColors[sector]};`}">
+        ${escapeHTML(sector)} ${load}/${cap}
+    </span>`;
 }
 
 // --- OTOMATİK ATAMA ---
@@ -1760,83 +2114,40 @@ function runAssignments() {
     }
 
     if (schoolHubs.length === 0) {
-        toast("Okul şubeleri listesi yüklenmemiş. Lütfen Okul Şubeleri CSV dosyasını yükleyip 'Haritada İşaretle' butonuna basın.", "error", 7000);
+        toast("Okul şubeleri listesi yüklenmemiş. Lütfen Ayarlar sekmesinden Okul Şubeleri CSV dosyasını yükleyin.", "error", 7000);
         return;
     }
 
-    lines.forEach(l => map.removeLayer(l));
-    lines = [];
-
     assignments = [];
+    unassigned = [];
+    openPersonKey = null;
 
-    schoolHubs.forEach(h => {
-        h.loadBySector = {
-            "Gişe": 0,
-            "Bireysel": 0,
-            "KOBİ": 0
-        };
-    });
+    schoolHubs.forEach(h => { h.loadBySector = emptyLoad(); });
 
-    const maxCap = parseInt(document.getElementById("max-capacity").value);
-    const listEl = document.getElementById("results");
-    const html = [];
+    const maxCap = getMaxCapacity();
 
     newHires.forEach(person => {
         const origin = getBranchByName(person.branch);
 
         if (!origin) {
-            html.push(`
-                <div class="list-item error" data-search="${escapeHTML(person.name + " " + person.branch)}">
-                    <div class="avatar is-error">${escapeHTML(initials(person.name))}</div>
-                    <div class="item-body">
-                        <div class="item-name">${escapeHTML(person.name)}</div>
-                        <div class="item-error-text">Atandığı şube bulunamadı: ${escapeHTML(person.branch)}</div>
-                    </div>
-                </div>
-            `);
+            unassigned.push({
+                name: person.name,
+                branch: person.branch,
+                sector: person.sector,
+                reason: "Atandığı şube listede bulunamadı: " + person.branch
+            });
             return;
         }
 
-        const eligibleHubs = schoolHubs.filter(hub => hub.areas.includes(person.sector));
-
-        if (eligibleHubs.length === 0) {
-            html.push(`
-                <div class="list-item error" data-search="${escapeHTML(person.name + " " + person.sector)}">
-                    <div class="avatar is-error">${escapeHTML(initials(person.name))}</div>
-                    <div class="item-body">
-                        <div class="item-name">${escapeHTML(person.name)}</div>
-                        <div class="item-error-text">${escapeHTML(person.sector)} için uygun okul şube bulunamadı!</div>
-                    </div>
-                </div>
-            `);
-            return;
-        }
-
-        const options = eligibleHubs.map(h => {
-            const dest = getBranchByName(h.name);
-
-            if (!dest) {
-                console.warn("Okul şube koordinatı bulunamadı:", h.name);
-                return null;
-            }
-
-            return {
-                hub: h,
-                dest: dest,
-                dist: getDistance(origin.lat, origin.lng, dest.lat, dest.lng)
-            };
-        }).filter(Boolean).sort((a, b) => a.dist - b.dist);
+        const options = getAlternatives(person);
 
         if (options.length === 0) {
-            html.push(`
-                <div class="list-item error" data-search="${escapeHTML(person.name)}">
-                    <div class="avatar is-error">${escapeHTML(initials(person.name))}</div>
-                    <div class="item-body">
-                        <div class="item-name">${escapeHTML(person.name)}</div>
-                        <div class="item-error-text">Uygun okul şube bulundu ama koordinat eşleşmesi yapılamadı.</div>
-                    </div>
-                </div>
-            `);
+            unassigned.push({
+                name: person.name,
+                branch: person.branch,
+                sector: person.sector,
+                reason: person.sector + " için uygun okul şube bulunamadı!"
+            });
             return;
         }
 
@@ -1844,17 +2155,14 @@ function runAssignments() {
         let note = "";
 
         for (let opt of options) {
-            if (!opt.hub.loadBySector) {
-                opt.hub.loadBySector = {};
-            }
+            const hub = opt.hub;
 
-            if (opt.hub.loadBySector[person.sector] === undefined) {
-                opt.hub.loadBySector[person.sector] = 0;
-            }
+            if (!hub.loadBySector) hub.loadBySector = emptyLoad();
+            if (hub.loadBySector[person.sector] === undefined) hub.loadBySector[person.sector] = 0;
 
-            if (opt.hub.loadBySector[person.sector] < maxCap) {
+            if (hub.loadBySector[person.sector] < maxCap) {
                 assigned = opt;
-                opt.hub.loadBySector[person.sector]++;
+                hub.loadBySector[person.sector]++;
 
                 if (opt !== options[0]) {
                     note = "En yakın uygun okul şube doluydu, sonraki uygun okul şubeye kaydırıldı.";
@@ -1866,81 +2174,463 @@ function runAssignments() {
 
         if (assigned) {
             assignments.push({
-                "Personel": person.name,
-                "Atandığı Şube": person.branch,
-                "Sektör": person.sector,
-                "Eğitim Yeri": assigned.hub.name,
-                "Mesafe": Math.round(assigned.dist),
-                "Not": note
+                name: person.name,
+                branch: person.branch,
+                sector: person.sector,
+                hubName: assigned.hub.name,
+                dist: assigned.dist,
+                note: note,
+                manual: false
             });
-
-            const color = sectorColors[person.sector] || "#10b981";
-
-            const line = L.polyline(
-                [[origin.lat, origin.lng], [assigned.dest.lat, assigned.dest.lng]],
-                {
-                    color: color,
-                    weight: 2.2,
-                    opacity: 0.75,
-                    lineCap: "round"
-                }
-            ).addTo(map);
-
-            line.bindPopup(`
-                <div class="popup-title">${escapeHTML(person.name)}</div>
-                <div class="item-line">${escapeHTML(person.branch)}</div>
-                <div class="item-line">→ ${escapeHTML(assigned.hub.name)} · ${Math.round(assigned.dist)} km</div>
-            `);
-
-            lines.push(line);
-
-            html.push(`
-                <div class="list-item ${note ? "warning" : ""}" data-search="${escapeHTML(person.name + " " + person.branch + " " + person.sector + " " + assigned.hub.name)}">
-                    <div class="avatar" style="--av:${color};">${escapeHTML(initials(person.name))}</div>
-                    <div class="item-body">
-                        <div class="item-name">${escapeHTML(person.name)}</div>
-                        <div class="item-line">${ICONS.pin}<span>${escapeHTML(person.branch)}</span></div>
-                        <div class="item-line" style="color:${color}; font-weight:600;">${ICONS.arrow}<span>${escapeHTML(assigned.hub.name)}</span></div>
-                        <div class="item-meta">
-                            ${sectorPill(person.sector)}
-                            <span class="pill pill-neutral">${Math.round(assigned.dist)} km</span>
-                        </div>
-                        ${note ? `<div class="item-note">⚠️ ${escapeHTML(note)}</div>` : ""}
-                    </div>
-                </div>
-            `);
         } else {
-            html.push(`
-                <div class="list-item error" data-search="${escapeHTML(person.name + " " + person.sector)}">
-                    <div class="avatar is-error">${escapeHTML(initials(person.name))}</div>
-                    <div class="item-body">
-                        <div class="item-name">${escapeHTML(person.name)}</div>
-                        <div class="item-error-text">${escapeHTML(person.sector)} için kapasitesi uygun okul şube bulunamadı!</div>
-                    </div>
-                </div>
-            `);
+            unassigned.push({
+                name: person.name,
+                branch: person.branch,
+                sector: person.sector,
+                reason: person.sector + " için kapasitesi uygun okul şube bulunamadı!"
+            });
         }
     });
 
-    listEl.innerHTML = html.join("");
-    listEl.scrollTop = 0;
+    drawAssignmentLines();
+    renderResults();
+    renderEditor();
+    updateStats();
 
-    document.getElementById("count").innerText = assignments.length;
-
-    const avg = assignments.length > 0
-        ? Math.round(assignments.reduce((sum, a) => sum + a["Mesafe"], 0) / assignments.length)
-        : null;
-
-    document.getElementById("stat-distance").innerText = avg === null ? "—" : avg;
-
-    const search = document.getElementById("result-search");
-    if (search && search.value) filterResults(search.value);
+    const avg = averageDistance();
 
     if (assignments.length > 0) {
         toast(assignments.length + " kişi atandı. Ortalama mesafe " + avg + " km.", "ok");
     } else {
         toast("Hiç kimse atanamadı. Kapasite ve okul şube alanlarını kontrol edin.", "warn");
     }
+}
+
+// Bir kişi için uygun okul şubeleri, kendi şubesine en yakından en uzağa sıralar
+function getAlternatives(person) {
+    const origin = getBranchByName(person.branch);
+    if (!origin) return [];
+
+    return schoolHubs
+        .map((hub, hubIndex) => {
+            if (!hub.areas.includes(person.sector)) return null;
+
+            const dest = getBranchByName(hub.name);
+            if (!dest) return null;
+
+            return {
+                hub: hub,
+                hubIndex: hubIndex,
+                dest: dest,
+                dist: getDistance(origin.lat, origin.lng, dest.lat, dest.lng)
+            };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.dist - b.dist);
+}
+
+function rebuildLoads() {
+    schoolHubs.forEach(h => { h.loadBySector = emptyLoad(); });
+
+    assignments.forEach(a => {
+        const hub = getHubByName(a.hubName);
+        if (!hub) return;
+
+        if (!hub.loadBySector) hub.loadBySector = emptyLoad();
+        if (hub.loadBySector[a.sector] === undefined) hub.loadBySector[a.sector] = 0;
+
+        hub.loadBySector[a.sector]++;
+    });
+}
+
+function averageDistance() {
+    if (assignments.length === 0) return null;
+    return Math.round(assignments.reduce((sum, a) => sum + a.dist, 0) / assignments.length);
+}
+
+function updateStats() {
+    document.getElementById("stat-hires").innerText = newHires.length;
+    document.getElementById("stat-hubs").innerText = schoolHubs.length;
+    document.getElementById("count").innerText = assignments.length;
+
+    const avg = averageDistance();
+    document.getElementById("stat-distance").innerText = avg === null ? "—" : avg;
+    document.getElementById("tab-edit-count").innerText = assignments.length;
+}
+
+// --- MANUEL ATAMA DEĞİŞİKLİĞİ ---
+function togglePerson(key) {
+    openPersonKey = openPersonKey === key ? null : key;
+    renderEditor();
+
+    if (!openPersonKey) return;
+
+    const [kind, idxText] = key.split(":");
+    if (kind === "a") highlightAssignment(parseInt(idxText, 10));
+}
+
+function applyReassign(kind, index, hubIndex) {
+    const hub = schoolHubs[hubIndex];
+    if (!hub) return;
+
+    const record = kind === "a" ? assignments[index] : unassigned[index];
+    if (!record) return;
+
+    const origin = getBranchByName(record.branch);
+    const dest = getBranchByName(hub.name);
+
+    if (!origin || !dest) {
+        toast("Şube koordinatı bulunamadığı için değişiklik yapılamadı.", "error");
+        return;
+    }
+
+    if (kind === "a" && normalizeText(record.hubName) === normalizeText(hub.name)) {
+        return;
+    }
+
+    const dist = getDistance(origin.lat, origin.lng, dest.lat, dest.lng);
+    const maxCap = getMaxCapacity();
+    const currentLoad = (hub.loadBySector && hub.loadBySector[record.sector]) || 0;
+    const willOverflow = currentLoad >= maxCap;
+
+    if (kind === "a") {
+        record.hubName = hub.name;
+        record.dist = dist;
+        record.note = "Manuel olarak değiştirildi.";
+        record.manual = true;
+        openPersonKey = "a:" + index;
+    } else {
+        unassigned.splice(index, 1);
+        assignments.push({
+            name: record.name,
+            branch: record.branch,
+            sector: record.sector,
+            hubName: hub.name,
+            dist: dist,
+            note: "Manuel olarak atandı.",
+            manual: true
+        });
+        openPersonKey = "a:" + (assignments.length - 1);
+    }
+
+    rebuildLoads();
+    drawAssignmentLines();
+    renderResults();
+    renderEditor();
+    updateStats();
+
+    map.fitBounds(L.latLngBounds([[origin.lat, origin.lng], [dest.lat, dest.lng]]).pad(0.4), { animate: true });
+
+    if (willOverflow) {
+        toast(`${record.name} → ${hub.name} (${Math.round(dist)} km). Dikkat: bu okul şubede ${record.sector} kapasitesi aşıldı (${currentLoad + 1}/${maxCap}).`, "warn", 6000);
+    } else {
+        toast(`${record.name} → ${hub.name} (${Math.round(dist)} km) olarak güncellendi.`, "ok");
+    }
+}
+
+function removeAssignment(index) {
+    const record = assignments[index];
+    if (!record) return;
+
+    assignments.splice(index, 1);
+    unassigned.push({
+        name: record.name,
+        branch: record.branch,
+        sector: record.sector,
+        reason: "Manuel olarak atamadan çıkarıldı."
+    });
+
+    openPersonKey = null;
+
+    rebuildLoads();
+    drawAssignmentLines();
+    renderResults();
+    renderEditor();
+    updateStats();
+
+    toast(record.name + " atamadan çıkarıldı, atanmayanlar listesine taşındı.", "info");
+}
+
+function focusHub(hubIndex) {
+    const hub = schoolHubs[hubIndex];
+    if (!hub) return;
+
+    const dest = getBranchByName(hub.name);
+    if (!dest) return;
+
+    map.setView([dest.lat, dest.lng], Math.max(map.getZoom(), 10), { animate: true });
+
+    const marker = schoolHubMarkers.find(m => {
+        const ll = m.getLatLng();
+        return Math.abs(ll.lat - dest.lat) < 1e-9 && Math.abs(ll.lng - dest.lng) < 1e-9;
+    });
+
+    if (marker) marker.openPopup();
+}
+
+function highlightAssignment(index) {
+    lines.forEach(line => {
+        const isTarget = line.assignIndex === index;
+
+        line.setStyle({
+            weight: isTarget ? 5 : (assignments[line.assignIndex] && assignments[line.assignIndex].manual ? 3 : 2.2),
+            opacity: isTarget ? 1 : 0.6
+        });
+
+        if (isTarget) line.bringToFront();
+    });
+
+    const record = assignments[index];
+    if (!record) return;
+
+    const origin = getBranchByName(record.branch);
+    const dest = getBranchByName(record.hubName);
+
+    if (origin && dest) {
+        map.fitBounds(L.latLngBounds([[origin.lat, origin.lng], [dest.lat, dest.lng]]).pad(0.4), { animate: true });
+    }
+}
+
+// --- HARİTA ÇİZİMLERİ ---
+function clearAssignmentLines() {
+    lines.forEach(l => map.removeLayer(l));
+    lines = [];
+}
+
+function drawAssignmentLines() {
+    clearAssignmentLines();
+
+    assignments.forEach((a, index) => {
+        const origin = getBranchByName(a.branch);
+        const dest = getBranchByName(a.hubName);
+
+        if (!origin || !dest) return;
+
+        const color = sectorColors[a.sector] || "#10b981";
+
+        const line = L.polyline(
+            [[origin.lat, origin.lng], [dest.lat, dest.lng]],
+            {
+                color: color,
+                weight: a.manual ? 3 : 2.2,
+                opacity: a.manual ? 0.9 : 0.75,
+                dashArray: a.manual ? "7 5" : null,
+                lineCap: "round"
+            }
+        ).addTo(map);
+
+        line.assignIndex = index;
+
+        line.bindPopup(`
+            <div class="popup-title">${escapeHTML(a.name)}</div>
+            <div class="popup-label">${escapeHTML(a.sector)}${a.manual ? " · manuel" : ""}</div>
+            <div>${escapeHTML(a.branch)}</div>
+            <div>→ ${escapeHTML(a.hubName)} · ${Math.round(a.dist)} km</div>
+        `);
+
+        lines.push(line);
+    });
+}
+
+// --- SONUÇ LİSTESİ (ATAMA SEKMESİ) ---
+function renderResults() {
+    const listEl = document.getElementById("results");
+
+    if (assignments.length === 0 && unassigned.length === 0) {
+        listEl.innerHTML = emptyState("Sonuçlar burada görünecek", "Önce Ayarlar sekmesinden CSV dosyalarını yükleyin");
+        return;
+    }
+
+    const html = [];
+
+    assignments.forEach(a => {
+        const color = sectorColors[a.sector] || "#10b981";
+
+        html.push(`
+            <div class="list-item ${a.note && !a.manual ? "warning" : ""}" data-search="${escapeHTML(a.name + " " + a.branch + " " + a.sector + " " + a.hubName)}">
+                <div class="avatar" style="--av:${color};">${escapeHTML(initials(a.name))}</div>
+                <div class="item-body">
+                    <div class="item-name">${escapeHTML(a.name)}</div>
+                    <div class="item-line">${ICONS.pin}<span>${escapeHTML(a.branch)}</span></div>
+                    <div class="item-line" style="color:${color}; font-weight:600;">${ICONS.arrow}<span>${escapeHTML(a.hubName)}</span></div>
+                    <div class="item-meta">
+                        ${sectorPill(a.sector)}
+                        <span class="pill pill-neutral">${Math.round(a.dist)} km</span>
+                        ${a.manual ? `<span class="pill pill-manual">Manuel</span>` : ""}
+                    </div>
+                    ${a.note && !a.manual ? `<div class="item-note">⚠️ ${escapeHTML(a.note)}</div>` : ""}
+                </div>
+            </div>
+        `);
+    });
+
+    unassigned.forEach(u => {
+        html.push(`
+            <div class="list-item error" data-search="${escapeHTML(u.name + " " + u.branch + " " + u.sector)}">
+                <div class="avatar is-error">${escapeHTML(initials(u.name))}</div>
+                <div class="item-body">
+                    <div class="item-name">${escapeHTML(u.name)}</div>
+                    <div class="item-error-text">${escapeHTML(u.reason)}</div>
+                </div>
+            </div>
+        `);
+    });
+
+    listEl.innerHTML = html.join("");
+
+    const search = document.getElementById("result-search");
+    if (search && search.value) filterResults(search.value);
+}
+
+// --- DÜZENLEME SEKMESİ ---
+function renderEditor() {
+    const el = document.getElementById("editor");
+    if (!el) return;
+
+    if (schoolHubs.length === 0) {
+        el.innerHTML = emptyState("Önce okul şubeleri yükleyin", "Ayarlar sekmesinden CSV dosyalarını seçebilirsiniz");
+        return;
+    }
+
+    if (assignments.length === 0 && unassigned.length === 0) {
+        el.innerHTML = emptyState("Henüz atama yapılmadı", "Atama sekmesinden Otomatik Dağıt'a basın");
+        return;
+    }
+
+    const term = normalizeText((document.getElementById("editor-search") || {}).value || "");
+    const cap = getMaxCapacity();
+    const html = [];
+
+    schoolHubs.forEach((hub, hubIndex) => {
+        const hubMatches = term === "" || normalizeText(hub.name).includes(term);
+
+        const people = assignments
+            .map((a, index) => ({ record: a, index: index }))
+            .filter(item => normalizeText(item.record.hubName) === normalizeText(hub.name))
+            .filter(item => hubMatches || normalizeText(item.record.name + " " + item.record.branch).includes(term))
+            .sort((a, b) => a.record.dist - b.record.dist);
+
+        if (term !== "" && !hubMatches && people.length === 0) return;
+
+        const loadPills = hub.areas.map(area => {
+            const load = (hub.loadBySector && hub.loadBySector[area]) || 0;
+            const over = load > cap;
+
+            return `<span class="pill ${over ? "pill-warn" : ""}" ${over ? "" : `style="--pc:${sectorColors[area]};"`}>${escapeHTML(area)} ${load}/${cap}</span>`;
+        }).join("");
+
+        html.push(`
+            <div class="hub-card">
+                <div class="hub-head" onclick="focusHub(${hubIndex})" title="Haritada göster">
+                    <span class="hub-dot" style="background:${hubGradient(hub.areas)};"></span>
+                    <span class="hub-name">${escapeHTML(hub.name)}</span>
+                    <span class="hub-load">${loadPills}</span>
+                </div>
+                <div class="hub-people">
+                    ${people.length === 0
+                        ? `<div class="hub-empty">Bu okul şubeye atanmış katılımcı yok.</div>`
+                        : people.map(item => personBlock("a", item.index, item.record)).join("")}
+                </div>
+            </div>
+        `);
+    });
+
+    const pendingPeople = unassigned
+        .map((u, index) => ({ record: u, index: index }))
+        .filter(item => term === "" || normalizeText(item.record.name + " " + item.record.branch).includes(term));
+
+    if (pendingPeople.length > 0) {
+        html.push(`
+            <div class="hub-card">
+                <div class="hub-head" style="cursor:default;">
+                    <span class="hub-dot" style="background:var(--muted);"></span>
+                    <span class="hub-name">Atanmayanlar</span>
+                    <span class="hub-load"><span class="pill pill-neutral">${pendingPeople.length} kişi</span></span>
+                </div>
+                <div class="hub-people">
+                    ${pendingPeople.map(item => personBlock("u", item.index, item.record)).join("")}
+                </div>
+            </div>
+        `);
+    }
+
+    el.innerHTML = html.length > 0
+        ? html.join("")
+        : emptyState("Eşleşme bulunamadı", "Farklı bir katılımcı veya okul şube adı deneyin");
+}
+
+function personBlock(kind, index, record) {
+    const key = kind + ":" + index;
+    const isOpen = openPersonKey === key;
+    const color = sectorColors[record.sector] || "#94a3b8";
+
+    const subtitle = kind === "a"
+        ? `${escapeHTML(record.branch)} · ${Math.round(record.dist)} km`
+        : escapeHTML(record.reason || record.branch);
+
+    return `
+        <button type="button" class="person-row ${isOpen ? "is-open" : ""}" onclick="togglePerson('${key}')">
+            <span class="avatar" style="--av:${color}; width:28px; height:28px; flex:0 0 28px; border-radius:9px;">${escapeHTML(initials(record.name))}</span>
+            <span class="person-main">
+                <span class="person-name">${escapeHTML(record.name)}${record.manual ? ` <span class="pill pill-manual">Manuel</span>` : ""}</span>
+                <span class="person-sub">${subtitle}</span>
+            </span>
+            ${ICONS.chevron}
+        </button>
+        ${isOpen ? alternativesBlock(kind, index, record) : ""}
+    `;
+}
+
+function alternativesBlock(kind, index, record) {
+    const options = getAlternatives(record);
+
+    if (options.length === 0) {
+        const originMissing = !getBranchByName(record.branch);
+
+        const reason = originMissing
+            ? `Katılımcının şubesi ("${record.branch}") şube listesinde bulunamadığı için mesafe hesaplanamıyor. CSV'deki şube adını düzeltip yeniden yükleyin.`
+            : `${record.sector} alanı için uygun okul şube yok.`;
+
+        return `
+            <div class="alt-panel">
+                <div class="alt-title">Alternatif okul şubeler</div>
+                <div class="hub-empty">${escapeHTML(reason)}</div>
+            </div>
+        `;
+    }
+
+    const cap = getMaxCapacity();
+
+    const rows = options.map((opt, rank) => {
+        const isCurrent = kind === "a" && normalizeText(opt.hub.name) === normalizeText(record.hubName);
+        const load = (opt.hub.loadBySector && opt.hub.loadBySector[record.sector]) || 0;
+        const isFull = !isCurrent && load >= cap;
+
+        return `
+            <button type="button"
+                class="alt-row ${isCurrent ? "is-current" : ""} ${isFull ? "is-full" : ""}"
+                ${isCurrent ? "disabled" : `onclick="applyReassign('${kind}', ${index}, ${opt.hubIndex})"`}>
+                <span class="alt-rank">${rank + 1}</span>
+                <span class="alt-name">${escapeHTML(opt.hub.name)}</span>
+                <span class="alt-dist">${Math.round(opt.dist)} km</span>
+                <span class="pill ${isFull ? "pill-warn" : "pill-neutral"}">${load}/${cap}</span>
+                ${isCurrent ? `<span class="pill" style="--pc:var(--success);">Mevcut</span>` : ""}
+            </button>
+        `;
+    }).join("");
+
+    return `
+        <div class="alt-panel">
+            <div class="alt-title">Alternatif okul şubeler · en yakından en uzağa</div>
+            ${rows}
+            ${kind === "a" ? `
+                <button type="button" class="alt-row" style="color:var(--danger);" onclick="removeAssignment(${index})">
+                    <span class="alt-rank" style="color:var(--danger);">${ICONS.unlink}</span>
+                    <span class="alt-name">Atamayı kaldır</span>
+                </button>
+            ` : ""}
+        </div>
+    `;
 }
 
 // --- DIŞA AKTARMA ---
@@ -1951,12 +2641,12 @@ function exportCSV() {
     }
 
     const exportRows = assignments.map(item => ({
-        "Katılımcı Adı Soyadı": item["Personel"],
-        "Katılımcının Şubesi": item["Atandığı Şube"],
-        "Sektör": item["Sektör"],
-        "Atandığı Okul Şube": item["Eğitim Yeri"],
-        "Mesafe (km)": item["Mesafe"],
-        "Not": item["Not"]
+        "Katılımcı Adı Soyadı": item.name,
+        "Katılımcının Şubesi": item.branch,
+        "Sektör": item.sector,
+        "Atandığı Okul Şube": item.hubName,
+        "Mesafe (km)": Math.round(item.dist),
+        "Not": item.note
     }));
 
     const csv = Papa.unparse(exportRows, {
@@ -1965,23 +2655,222 @@ function exportCSV() {
         newline: "\r\n"
     });
 
-    const blob = new Blob(["\uFEFF" + csv], {
-        type: "text/csv;charset=utf-8;"
-    });
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Eslestirme_Listesi.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
+    downloadCSVFile(csv, "Eslestirme_Listesi.csv");
     toast("Eşleştirme listesi indirildi.", "ok");
+}
+
+function exportJSON() {
+    if (newHires.length === 0 && schoolHubs.length === 0) {
+        toast("Yedeklenecek veri yok.", "warn");
+        return;
+    }
+
+    const state = {
+        version: 1,
+        savedAt: new Date().toISOString(),
+        maxCapacity: getMaxCapacity(),
+        newHires: newHires,
+        schoolHubs: schoolHubs.map(h => ({ name: h.name, areas: h.areas })),
+        assignments: assignments,
+        unassigned: unassigned
+    };
+
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8;" });
+    const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+
+    downloadBlob(blob, "Atama_Yedegi_" + stamp + ".json");
+    toast("Yedek indirildi.", "ok");
+}
+
+function importJSONFile(file) {
+    const reader = new FileReader();
+
+    reader.onload = function() {
+        let state;
+
+        try {
+            state = JSON.parse(reader.result);
+        } catch (error) {
+            console.error("JSON okuma hatası:", error);
+            setStatus("json-status", "Dosya okunamadı, geçerli bir JSON değil.", "error");
+            toast("Yedek dosyası okunamadı.", "error");
+            return;
+        }
+
+        applyState(state);
+    };
+
+    reader.onerror = function() {
+        setStatus("json-status", "Dosya okunamadı.", "error");
+        toast("Yedek dosyası okunamadı.", "error");
+    };
+
+    reader.readAsText(file, "UTF-8");
+}
+
+function applyState(state) {
+    if (!state || typeof state !== "object" || (!Array.isArray(state.newHires) && !Array.isArray(state.schoolHubs))) {
+        setStatus("json-status", "Yedek dosyasının içeriği tanınamadı.", "error");
+        toast("Yedek dosyasının içeriği tanınamadı.", "error");
+        return;
+    }
+
+    newHires = (state.newHires || [])
+        .map(p => ({
+            name: cleanCSVValue(p && p.name),
+            branch: cleanCSVValue(p && p.branch),
+            sector: normalizeSector(p && p.sector)
+        }))
+        .filter(p => p.name && p.branch && p.sector);
+
+    schoolHubs = (state.schoolHubs || [])
+        .map(h => {
+            const branch = getBranchByName(h && h.name);
+            if (!branch) return null;
+
+            const areas = [...new Set((h.areas || []).map(normalizeSector).filter(Boolean))];
+            if (areas.length === 0) return null;
+
+            return { name: branch.name, areas: areas, loadBySector: emptyLoad() };
+        })
+        .filter(Boolean);
+
+    assignments = (state.assignments || [])
+        .map(a => {
+            if (!a) return null;
+
+            const origin = getBranchByName(a.branch);
+            const hub = getHubByName(a.hubName);
+            const dest = hub ? getBranchByName(hub.name) : null;
+
+            if (!origin || !hub || !dest) return null;
+
+            return {
+                name: cleanCSVValue(a.name),
+                branch: origin.name,
+                sector: normalizeSector(a.sector),
+                hubName: hub.name,
+                dist: typeof a.dist === "number" ? a.dist : getDistance(origin.lat, origin.lng, dest.lat, dest.lng),
+                note: typeof a.note === "string" ? a.note : "",
+                manual: Boolean(a.manual)
+            };
+        })
+        .filter(a => a && a.name && a.sector);
+
+    unassigned = (state.unassigned || [])
+        .map(u => u && {
+            name: cleanCSVValue(u.name),
+            branch: cleanCSVValue(u.branch),
+            sector: normalizeSector(u.sector),
+            reason: cleanCSVValue(u.reason)
+        })
+        .filter(u => u && u.name);
+
+    if (state.maxCapacity) {
+        document.getElementById("max-capacity").value = Math.min(99, Math.max(1, parseInt(state.maxCapacity, 10) || 1));
+    }
+
+    openPersonKey = null;
+
+    rebuildLoads();
+    drawSchoolHubMarkers();
+    drawAssignmentLines();
+    renderResults();
+    renderEditor();
+    updateStats();
+
+    setStatus("upload-status", `<b>${newHires.length}</b> kişi yedekten yüklendi.`, newHires.length > 0 ? "ok" : "warn");
+    setStatus("school-upload-status", `<b>${schoolHubs.length}</b> okul şube yedekten yüklendi.`, schoolHubs.length > 0 ? "ok" : "warn");
+
+    const savedAt = state.savedAt ? new Date(state.savedAt) : null;
+    const stamp = savedAt && !isNaN(savedAt) ? savedAt.toLocaleString("tr-TR") : "bilinmiyor";
+
+    setStatus("json-status",
+        `Yedek geri yüklendi.<br>${newHires.length} kişi · ${schoolHubs.length} okul şube · ${assignments.length} atama<br>Yedek tarihi: ${escapeHTML(stamp)}`,
+        "ok");
+
+    toast(`Yedek geri yüklendi: ${assignments.length} atama.`, "ok");
+}
+
+// --- SIFIRLAMA ---
+function resetHires() {
+    if (!confirm("Katılımcı listesi ve tüm atamalar silinecek. Devam edilsin mi?")) return;
+
+    newHires = [];
+    assignments = [];
+    unassigned = [];
+    openPersonKey = null;
+
+    clearAssignmentLines();
+    rebuildLoads();
+    renderResults();
+    renderEditor();
+    updateStats();
+
+    document.getElementById("results").innerHTML = emptyState("Katılımcı listesi sıfırlandı", "Ayarlar sekmesinden yeni bir CSV yükleyebilirsiniz");
+    setStatus("upload-status", "Henüz personel dosyası yüklenmedi.");
+
+    toast("Katılımcı listesi sıfırlandı.", "ok");
+}
+
+function resetHubs() {
+    if (!confirm("Okul şube listesi, harita işaretleri ve atamalar silinecek. Devam edilsin mi?")) return;
+
+    schoolHubs = [];
+    assignments = [];
+    unassigned = [];
+    openPersonKey = null;
+
+    schoolHubMarkers.forEach(m => map.removeLayer(m));
+    schoolHubMarkers = [];
+
+    clearAssignmentLines();
+    renderResults();
+    renderEditor();
+    updateStats();
+
+    setStatus("school-upload-status", "Henüz okul şubeleri dosyası yüklenmedi.");
+
+    toast("Okul şube listesi sıfırlandı.", "ok");
+}
+
+function resetAll() {
+    if (!confirm("Tüm veriler silinip ekran ilk hâline dönecek. Devam edilsin mi?")) return;
+
+    newHires = [];
+    schoolHubs = [];
+    assignments = [];
+    unassigned = [];
+    openPersonKey = null;
+
+    schoolHubMarkers.forEach(m => map.removeLayer(m));
+    schoolHubMarkers = [];
+
+    clearAssignmentLines();
+    updateStats();
+    renderEditor();
+
+    document.getElementById("results").innerHTML = emptyState("Sonuçlar burada görünecek", "Önce Ayarlar sekmesinden CSV dosyalarını yükleyin");
+    document.getElementById("csv-bulk-upload").value = "";
+    document.getElementById("json-upload").value = "";
+    document.getElementById("file-chips").innerHTML = "";
+    document.getElementById("result-search").value = "";
+    document.getElementById("editor-search").value = "";
+
+    setStatus("upload-status", "Henüz personel dosyası yüklenmedi.");
+    setStatus("school-upload-status", "Henüz okul şubeleri dosyası yüklenmedi.");
+    setStatus("json-status", "Henüz yedek yüklenmedi.");
+
+    map.setView([39.0, 35.0], 6);
+
+    toast("Her şey sıfırlandı.", "ok");
 }
 
 // --- DOSYA SEÇİMİ / SÜRÜKLE-BIRAK ---
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("csv-bulk-upload");
+const jsonDropzone = document.getElementById("json-dropzone");
+const jsonInput = document.getElementById("json-upload");
 
 function renderFileChips() {
     const files = Array.from(fileInput.files || []);
@@ -1994,23 +2883,31 @@ function renderFileChips() {
 
 fileInput.addEventListener("change", renderFileChips);
 
-["dragenter", "dragover"].forEach(evt => {
-    dropzone.addEventListener(evt, e => {
-        e.preventDefault();
-        dropzone.classList.add("is-dragging");
-    });
+jsonInput.addEventListener("change", () => {
+    const file = (jsonInput.files || [])[0];
+    if (file) importJSONFile(file);
 });
 
-["dragleave", "drop"].forEach(evt => {
-    dropzone.addEventListener(evt, e => {
-        e.preventDefault();
-        dropzone.classList.remove("is-dragging");
+function wireDropzone(zone, onFiles) {
+    ["dragenter", "dragover"].forEach(evt => {
+        zone.addEventListener(evt, e => {
+            e.preventDefault();
+            zone.classList.add("is-dragging");
+        });
     });
-});
 
-dropzone.addEventListener("drop", e => {
-    const dropped = Array.from(e.dataTransfer.files || [])
-        .filter(f => /\.csv$/i.test(f.name) || f.type === "text/csv");
+    ["dragleave", "drop"].forEach(evt => {
+        zone.addEventListener(evt, e => {
+            e.preventDefault();
+            zone.classList.remove("is-dragging");
+        });
+    });
+
+    zone.addEventListener("drop", e => onFiles(Array.from(e.dataTransfer.files || [])));
+}
+
+wireDropzone(dropzone, files => {
+    const dropped = files.filter(f => /\.csv$/i.test(f.name) || f.type === "text/csv");
 
     if (dropped.length === 0) {
         toast("Lütfen .csv uzantılı dosya bırakın.", "warn");
@@ -2025,6 +2922,21 @@ dropzone.addEventListener("drop", e => {
     toast(dropped.length + " dosya seçildi. Şimdi \"CSV'leri Yükle\" butonuna basın.", "info");
 });
 
+wireDropzone(jsonDropzone, files => {
+    const file = files.find(f => /\.json$/i.test(f.name) || f.type === "application/json");
+
+    if (!file) {
+        toast("Lütfen .json uzantılı yedek dosyası bırakın.", "warn");
+        return;
+    }
+
+    importJSONFile(file);
+});
+
+document.getElementById("max-capacity").addEventListener("change", () => {
+    if (assignments.length > 0 || unassigned.length > 0) renderEditor();
+});
+
 // --- HARİTA BAŞLANGIÇ İŞARETLERİ ---
 branches.forEach(b => {
     L.circleMarker([b.lat, b.lng], {
@@ -2034,6 +2946,8 @@ branches.forEach(b => {
         radius: 3.5
     }).addTo(map).bindPopup(`<div class="popup-title">${escapeHTML(b.name)}</div>`);
 });
+
+renderEditor();
 
 </script>
 </body>
