@@ -693,6 +693,13 @@ footer{padding:30px 44px 60px;max-width:1240px;margin:0 auto;color:var(--ink-3);
   <p class="sec-lede">On işlev, kurumun Azure OpenAI servisi üzerinden. Hepsi isteğe bağlıdır.</p>
 
   <div class="stack" style="margin-top:24px">
+    <div class="note warn">
+      <b>Kurum VPN'i açıkken bağlantı kurulmuyor</b>
+      <p>VPN açıkken trafik kurum ağı üzerinden yönlenir ve servis adresi oradan engellenir.
+      Yapay zekâ işlevlerini kullanacağın sırada <b>VPN'i kapat</b>. Planlama tarafı VPN'den etkilenmez,
+      her durumda çalışır.</p>
+    </div>
+
     <div class="note">
       <b>Erişim yoksa uygulama çalışmaya devam eder</b>
       <p>Planlama, sürükle-bırak, Excel, görsel çıktı, katılımcı listesi, öneriler, plan denetimi ve otomatik dağıtım
@@ -814,10 +821,8 @@ footer{padding:30px 44px 60px;max-width:1240px;margin:0 auto;color:var(--ink-3);
           <td>Kurulum → <b>Tanılama Raporu</b>. Sorunun ağda mı, anahtarda mı, tarayıcıda mı olduğunu
           adım adım tespit eder ve yöneticine iletebileceğin bir metin üretir. Planlama işlevleri bundan etkilenmez</td></tr>
         <tr><td>“Bağlantı zaman aşımına uğradı”</td>
-          <td>Sunucuya ağ üzerinden hiç ulaşılamıyor — anahtar ya da uygulama sorunu değil.
-          VPN'e bağlan ve tekrar dene; sürerse Tanılama Raporu'nu servis yöneticisine ilet.
-          Sorulacak soru: bu adrese son kullanıcı bilgisayarlarından tarayıcı üzerinden erişim açık mı,
-          IP kısıtı ya da proxy gereksinimi var mı</td></tr>
+          <td><b>Önce kurum VPN'ini kapat ve tekrar dene.</b> VPN açıkken trafik kurum ağına yönlenir ve
+          bu adres oradan engellenir — bilinen durum budur. Sürerse Tanılama Raporu'nu servis yöneticisine ilet</td></tr>
         <tr><td>Konsolda “Unsafe attempt to load URL … file: URLs are treated as unique security origins”</td>
           <td>Zararsız. Dosya doğrudan diskten açıldığında tarayıcının ikon tanımları için verdiği bilgi mesajı.
           Uygulamanın çalışmasını etkilemez</td></tr>

@@ -53,8 +53,8 @@ async function aiCall(mode, body, ms = AI_TIMEOUT) {
 function netError(r) {
   if (r.aborted || r.ms > AI_TIMEOUT - 1500) {
     return new Error(`Bağlantı zaman aşımına uğradı (${Math.round(r.ms / 1000)} sn). ` +
-      'Servise ağ üzerinden hiç ulaşılamıyor — kurum ağı, güvenlik duvarı ya da VPN engelliyor olabilir. ' +
-      'Kurulum sekmesindeki “Tanılama Raporu” ile ayrıntıyı görebilirsin.');
+      'Servise ağ üzerinden hiç ulaşılamıyor. ÖNCE ŞUNU DENE: kurum VPN’i açıksa kapatıp tekrar dene — ' +
+      'VPN bu adresi engelliyor olabilir. Sürerse Kurulum sekmesindeki “Tanılama Raporu”na bak.');
   }
   return new Error('İstek gönderilemedi. Bilgisayarın ağ bağlantısı kapalı olabilir ya da ' +
     'tarayıcı isteği engelledi. Kurulum sekmesindeki “Tanılama Raporu” nedenini gösterir.');
@@ -151,14 +151,18 @@ async function aiDiagnose() {
   } else if (!reach) {
     lines.push(
       'Sunucuya ağ seviyesinde hiç ulaşılamıyor. Bu bir uygulama ya da anahtar sorunu DEĞİL.',
-      'Olası nedenler:',
+      '',
+      'ÖNCE BUNU DENE: Kurum VPN’i açıksa KAPAT ve tekrar dene.',
+      'VPN açıkken trafik kurum ağına yönlendirilir ve bu adres oradan engellenebilir.',
+      'Bilinen bir durumdur; çoğu vakada sorun budur.',
+      '',
+      'Sürerse olası nedenler:',
       '  • Kurum güvenlik duvarı bu adresi son kullanıcı bilgisayarlarına kapatmış',
-      '  • VPN bağlantısı gerekiyor ve bağlı değilsin',
-      '  • Servis yalnızca sunucu ağından erişime açık (IP kısıtı)',
+      '  • Servis yalnızca belirli ağlardan erişime açık (IP kısıtı)',
       '  • Tarayıcının kullandığı vekil sunucu (proxy) bu adresi geçirmiyor',
       'Yapılacak: Bu raporu servis yöneticisine ilet ve şunu sor —',
       '  “Bu APIM adresine son kullanıcı bilgisayarlarından, tarayıcı üzerinden erişim',
-      '   açık mı? IP kısıtı ya da proxy gereksinimi var mı?”');
+      '   açık mı? Kurum VPN’i üzerinden neden engelleniyor?”');
   } else if (r1.res && [401, 403].includes(r1.res.status) && r2.res && [401, 403].includes(r2.res.status)) {
     lines.push('Sunucuya ulaşılıyor ama anahtar kabul edilmiyor. Anahtarı kontrol et ya da yenile.');
   } else if (r1.err && r2.err) {
