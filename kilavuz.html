@@ -1,0 +1,845 @@
+<title>Program Planlayıcı Kılavuzu</title>
+<style>
+/* ============================================================
+   Belge kimliği — serin lacivert kağıt, KT altını, Constantia
+   ============================================================ */
+:root{
+  --paper:#f4f7f9;
+  --surface:#ffffff;
+  --surface-2:#eaeff4;
+  --line:#d7dfe7;
+  --line-soft:#e7edf2;
+  --ink:#0e1b2b;
+  --ink-2:#33465a;
+  --ink-3:#63768a;
+  --gold:#9a6c22;
+  --gold-line:#c9a15c;
+  --gold-wash:#faf3e6;
+  --navy:#16385c;
+  --navy-wash:#e9f0f7;
+  --ok:#186b4f;      --ok-wash:#e6f4ee;
+  --warn:#8c5a10;    --warn-wash:#fbf1de;
+  --stop:#993247;    --stop-wash:#fbebee;
+
+  --display:Constantia,Cambria,Georgia,'Times New Roman',serif;
+  --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --mono:'Cascadia Mono',Consolas,'SF Mono',ui-monospace,'Courier New',monospace;
+
+  --rail:250px;
+  --measure:69ch;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#080f18;
+    --surface:#101d2c;
+    --surface-2:#16273a;
+    --line:#26394f;
+    --line-soft:#1d2e42;
+    --ink:#e7eef6;
+    --ink-2:#b3c3d4;
+    --ink-3:#8496a9;
+    --gold:#d9b477;
+    --gold-line:#8a6a34;
+    --gold-wash:#231c0f;
+    --navy:#8fb6dd;
+    --navy-wash:#13253a;
+    --ok:#5cc9a1;      --ok-wash:#0d2a22;
+    --warn:#e0ab52;    --warn-wash:#2a2110;
+    --stop:#e58aa0;    --stop-wash:#2c141b;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#080f18;
+  --surface:#101d2c;
+  --surface-2:#16273a;
+  --line:#26394f;
+  --line-soft:#1d2e42;
+  --ink:#e7eef6;
+  --ink-2:#b3c3d4;
+  --ink-3:#8496a9;
+  --gold:#d9b477;
+  --gold-line:#8a6a34;
+  --gold-wash:#231c0f;
+  --navy:#8fb6dd;
+  --navy-wash:#13253a;
+  --ok:#5cc9a1;      --ok-wash:#0d2a22;
+  --warn:#e0ab52;    --warn-wash:#2a2110;
+  --stop:#e58aa0;    --stop-wash:#2c141b;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;line-height:1.25}
+p{margin:0}
+a{color:var(--gold);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:3px}
+code,kbd{font-family:var(--mono);font-size:.86em}
+code{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:4px;padding:.08em .38em}
+kbd{background:var(--surface);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;
+  padding:.12em .45em;font-weight:600;white-space:nowrap}
+
+/* ---------- iskelet ---------- */
+.shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:0;max-width:1240px;margin:0 auto}
+.rail{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:34px 20px 40px;
+  border-right:1px solid var(--line);display:flex;flex-direction:column;gap:22px}
+.rail-brand{display:flex;flex-direction:column;gap:3px}
+.rail-brand b{font-family:var(--display);font-size:17px;letter-spacing:-.01em}
+.rail-brand span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.rail nav{display:flex;flex-direction:column;gap:1px}
+.rail nav a{display:flex;gap:9px;align-items:baseline;text-decoration:none;color:var(--ink-2);
+  font-size:13.5px;padding:5px 8px;border-radius:5px;border-left:2px solid transparent}
+.rail nav a:hover{background:var(--surface-2);color:var(--ink)}
+.rail nav a .n{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.rail-note{margin-top:auto;font-size:12px;line-height:1.6;color:var(--ink-3);border-top:1px solid var(--line-soft);padding-top:14px}
+
+main{padding:34px 44px 90px;min-width:0}
+section{padding:44px 0;border-top:1px solid var(--line-soft)}
+section:first-of-type{border-top:none;padding-top:8px}
+.prose{max-width:var(--measure)}
+.prose p+p{margin-top:13px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.stack-lg{display:flex;flex-direction:column;gap:26px}
+
+/* ---------- başlık bloğu ---------- */
+.masthead{padding:52px 0 40px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.masthead h1{font-size:clamp(34px,5vw,50px);letter-spacing:-.025em;margin:14px 0 0}
+.masthead .lede{font-size:18px;color:var(--ink-2);margin-top:16px;max-width:60ch;line-height:1.6}
+.masthead .facts{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:24px}
+.fact{font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 12px}
+
+h2.sec{font-size:27px;letter-spacing:-.02em;display:flex;align-items:baseline;gap:12px}
+h2.sec .n{font-family:var(--mono);font-size:13px;color:var(--gold);letter-spacing:.06em;font-weight:400}
+.sec-lede{color:var(--ink-2);margin-top:9px;max-width:var(--measure)}
+h3{font-size:19px;letter-spacing:-.012em;margin-bottom:2px}
+h4{font-size:15.5px;letter-spacing:-.005em}
+
+/* ---------- senaryo kartı ---------- */
+.scen{background:var(--surface);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.scen-h{padding:18px 22px;border-bottom:1px solid var(--line-soft);
+  display:flex;gap:16px;align-items:flex-start;background:var(--surface-2)}
+.scen-h .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold);border:1px solid var(--gold-line);border-radius:2px;padding:3px 7px;white-space:nowrap;margin-top:2px}
+.scen-h h3{font-size:18px}
+.scen-h p{font-size:13.5px;color:var(--ink-3);margin-top:3px}
+.scen-b{padding:20px 22px 24px}
+
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:26px minmax(0,1fr);gap:14px;align-items:start}
+ol.steps>li::before{content:counter(s);font-family:var(--mono);font-size:12px;color:var(--gold);
+  border:1px solid var(--gold-line);border-radius:99px;width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+ol.steps>li>div{padding-top:2px}
+ol.steps b{font-weight:600}
+ol.steps .sub{font-size:14px;color:var(--ink-2);margin-top:3px}
+
+/* ---------- referans tabloları ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:520px}
+caption{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);padding:12px 16px 10px;border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
+th{text-align:left;font-family:var(--body);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;padding:9px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 16px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+td b{color:var(--ink)}
+
+/* ---------- notlar ---------- */
+.note{border-left:3px solid var(--navy);background:var(--navy-wash);padding:14px 18px;border-radius:0 3px 3px 0;font-size:14.5px}
+.note.gold{border-color:var(--gold-line);background:var(--gold-wash)}
+.note.warn{border-color:var(--warn);background:var(--warn-wash)}
+.note.stop{border-color:var(--stop);background:var(--stop-wash)}
+.note b{display:block;margin-bottom:3px}
+.note p+p{margin-top:8px}
+
+/* ---------- rozetler ---------- */
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:2px;white-space:nowrap;
+  border:1px solid currentColor}
+.b-ai{color:var(--gold);background:var(--gold-wash)}
+.b-off{color:var(--ok);background:var(--ok-wash)}
+
+/* ---------- ızgaralar ---------- */
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:16px 18px}
+.tile h4{margin-bottom:5px}
+.tile p{font-size:14px;color:var(--ink-2)}
+.tile .where{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:9px;
+  padding-top:9px;border-top:1px dashed var(--line)}
+
+ul.plain{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.plain li{display:grid;grid-template-columns:7px minmax(0,1fr);gap:12px;align-items:start;font-size:15px;color:var(--ink-2)}
+ul.plain li::before{content:'';width:5px;height:5px;border-radius:99px;background:var(--gold-line);margin-top:9px}
+ul.plain li b{color:var(--ink)}
+
+dl.keys{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 18px;margin:0;align-items:baseline}
+dl.keys dt{margin:0}
+dl.keys dd{margin:0;font-size:14.5px;color:var(--ink-2)}
+
+footer{padding:30px 44px 60px;max-width:1240px;margin:0 auto;color:var(--ink-3);font-size:13px;
+  border-top:1px solid var(--line-soft)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);
+    flex-direction:column;padding:24px 22px}
+  .rail nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2px}
+  .rail-note{margin-top:14px}
+  main{padding:24px 22px 70px}
+  footer{padding:24px 22px 50px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  .rail{display:none}
+  .shell{grid-template-columns:1fr}
+  section{break-inside:auto}
+  .scen,.tile,.note{break-inside:avoid}
+}
+</style>
+
+<div class="shell">
+<aside class="rail">
+  <div class="rail-brand">
+    <b>Program Planlayıcı</b>
+    <span>Kullanım Kılavuzu</span>
+  </div>
+  <nav>
+    <a href="#baslarken"><span class="n">01</span> Başlarken</a>
+    <a href="#ekran"><span class="n">02</span> Ekranı tanı</a>
+    <a href="#kavramlar"><span class="n">03</span> Üç temel kavram</a>
+    <a href="#senaryolar"><span class="n">04</span> Senaryolar</a>
+    <a href="#referans"><span class="n">05</span> Fonksiyon referansı</a>
+    <a href="#kurulum"><span class="n">06</span> Kurulum sekmesi</a>
+    <a href="#ai"><span class="n">07</span> Yapay zekâ</a>
+    <a href="#veri"><span class="n">08</span> Veri ve yedekleme</a>
+    <a href="#sorun"><span class="n">09</span> Sorun giderme</a>
+  </nav>
+  <div class="rail-note">
+    Tek dosya, çevrimdışı çalışır.<br>
+    <code>takvim-planlayici.html</code>
+  </div>
+</aside>
+
+<main>
+
+<div class="masthead">
+  <div class="eyebrow">Kuveyt Türk Akademi</div>
+  <h1>Program Planlayıcı Kullanım Kılavuzu</h1>
+  <p class="lede">Oryantasyon programını planlamak için tasarlandı, her eğitim programı için kullanılabilir.
+  Bu kılavuz altı gerçek senaryoyu adım adım anlatır ve her fonksiyonun ne yaptığını tek tek açıklar.</p>
+  <div class="facts">
+    <span class="fact">Tek dosya · ~1,4 MB</span>
+    <span class="fact">Kurulum gerekmez</span>
+    <span class="fact">İnternetsiz çalışır</span>
+    <span class="fact">6 görünüm</span>
+    <span class="fact">10 yapay zekâ işlevi</span>
+  </div>
+</div>
+
+<!-- ============ 01 ============ -->
+<section id="baslarken">
+  <h2 class="sec"><span class="n">01</span> Başlarken</h2>
+  <p class="sec-lede">Dosyayı çift tıkla, açılır. Sunucu, kurulum, hesap yok.</p>
+
+  <div class="stack" style="margin-top:24px">
+    <div class="cols3">
+      <div class="tile">
+        <h4>Dosyayı aç</h4>
+        <p><code>takvim-planlayici.html</code> dosyasını çift tıkla. Chrome veya Edge'de açılır.</p>
+        <div class="where">Masaüstüne kopyalaman yeterli</div>
+      </div>
+      <div class="tile">
+        <h4>İlk açılışta ne var</h4>
+        <p>Hazır bir <b>Oryantasyon Grubu</b> programı gelir: 1. hafta 6 gün fiziki, 2. hafta 5 gün online.</p>
+        <div class="where">Silmek yerine üzerine çalış</div>
+      </div>
+      <div class="tile">
+        <h4>Kaydet butonu yok</h4>
+        <p>Her değişiklik anında tarayıcının yerel deposuna yazılır. Sekmeyi kapatsan da durur.</p>
+        <div class="where">Yedek için: Yedek Al</div>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <b>Dosyayı taşırsan veri gelmez</b>
+      <p>Veri dosyanın içinde değil, <b>o bilgisayarın tarayıcısında</b> tutulur. Dosyayı bir arkadaşına
+      gönderdiğinde o kişi boş bir uygulama görür. Programı da göndermek için üst sağdaki
+      <b>Yedek Al</b> ile JSON dosyasını çıkar, o kişi <b>Yedek Yükle</b> ile alsın.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section id="ekran">
+  <h2 class="sec"><span class="n">02</span> Ekranı tanı</h2>
+  <p class="sec-lede">Yukarıdan aşağıya dört şerit: kimlik ve görünümler, programlar, araçlar, çalışma alanı.</p>
+
+  <div class="stack" style="margin-top:24px">
+    <div class="tablewrap">
+      <table>
+        <caption>Üst şeritler</caption>
+        <thead><tr><th>Şerit</th><th>İçindekiler</th></tr></thead>
+        <tbody>
+          <tr><td>Başlık</td><td>KT Akademi logosu ve aktif programın adı · altı görünüm düğmesi ·
+            <b>Yapay Zekâ</b> komut çubuğu (<kbd>Ctrl</kbd>+<kbd>K</kbd>) · plan asistanı · açık/koyu tema</td></tr>
+          <tr><td>Program sekmeleri</td><td>Her grup ya da dönem ayrı bir sekme. Sekme adına <b>çift tıkla</b> yeniden adlandır,
+            sürükleyerek sırala. Sağda: Kopyala, Yedek Al, Yedek Yükle</td></tr>
+          <tr><td>Araç çubuğu</td><td>Başlangıç tarihi · İçe Aktar · Oturum Ekle · Metinden Program ·
+            canlı sayaç · Özet · Davet Metni · Görsel · Excel · Yazdır</td></tr>
+          <tr><td>Çalışma alanı</td><td>Seçtiğin görünüm. Katılımcılar ve Kurulum sekmelerinde araç çubuğu gizlenir</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:10px">Altı görünüm, tek veri</h3>
+    <p class="prose" style="color:var(--ink-2)">Hepsi aynı programı gösterir. Birinde yaptığın değişiklik hepsinde görünür.</p>
+    <div class="cols2">
+      <div class="tile"><h4>Takvim</h4><p>Sürükle-bırak planlama ekranı. Asıl çalışma burada yapılır.</p></div>
+      <div class="tile"><h4>Kartlar</h4><p>Sadece eğitim olan günler, kart düzeninde. Logolu başlıkla paylaşmaya ve yazdırmaya hazır.</p></div>
+      <div class="tile"><h4>Ajanda</h4><p>Gün gün akış, resmî duyuru düzeninde. Metin olarak kopyalanır.</p></div>
+      <div class="tile"><h4>Tablo</h4><p>Tüm oturumlar ve tüm alanlar. Aranabilir, Excel'e birebir aktarılır.</p></div>
+      <div class="tile"><h4>Katılımcılar</h4><p>Aday ve personel listelerini birleştirir, eksikleri raporlar.</p></div>
+      <div class="tile"><h4>Kurulum</h4><p>Programın iskeleti: haftalar, bloklar, gün türleri, alanlar, davranış kuralları.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 ============ -->
+<section id="kavramlar">
+  <h2 class="sec"><span class="n">03</span> Üç temel kavram</h2>
+  <p class="sec-lede">Bu üçünü anladığında uygulamanın tamamı anlaşılır.</p>
+
+  <div class="cols3" style="margin-top:24px">
+    <div class="tile">
+      <h4>Oturum</h4>
+      <p>Takvime yerleşen her şey. Bir eğitim, bir sunum, bir atölye. Adı, süresi, eğitmeni ve
+      senin tanımladığın diğer alanları vardır.</p>
+      <div class="where">Havuzda ya da bir günde durur</div>
+    </div>
+    <div class="tile">
+      <h4>Blok</h4>
+      <p>Günün dilimleri. İki tür: <b>ders</b> bloğu (oturum düşer, kapasitesi vardır) ve
+      <b>ara</b> bloğu (kahvaltı, öğle — oturum almaz).</p>
+      <div class="where">Kurulum → Zaman Blokları</div>
+    </div>
+    <div class="tile">
+      <h4>Gün türü</h4>
+      <p>Her günün bir türü var: Fiziki, Online ya da senin tanımladığın bir tür. Rengi ve
+      varsayılan lokasyonu buradan gelir.</p>
+      <div class="where">Kurulum → Gün Türleri</div>
+    </div>
+  </div>
+
+  <div class="note gold" style="margin-top:20px">
+    <b>Tam gün kuralı</b>
+    <p>Bir oturumun süresi, günün toplam ders kapasitesine eşit ya da fazlaysa otomatik olarak
+    <b>tam gün</b> olur ve günün tamamını kaplar. Varsayılan kurulumda sabah 3 + öğleden sonra 3 = 6 saat,
+    yani <b>6 saatlik oturum tam gün demektir</b>. Tam gün oturum yerleştirmek için o günün tamamen boş olması gerekir.</p>
+  </div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section id="senaryolar">
+  <h2 class="sec"><span class="n">04</span> Senaryolar</h2>
+  <p class="sec-lede">Altı gerçek iş, baştan sona. Kendi işine en yakın olanı takip et.</p>
+
+  <div class="stack-lg" style="margin-top:26px">
+
+    <!-- S1 -->
+    <article class="scen">
+      <div class="scen-h">
+        <span class="tag">Senaryo A</span>
+        <div>
+          <h3>Yeni bir oryantasyon dönemi planlamak</h3>
+          <p>Her dönem tekrarlanan asıl iş. Yapı hazır, sen sadece tarihi ve eğitimleri veriyorsun.</p>
+        </div>
+      </div>
+      <div class="scen-b">
+        <ol class="steps">
+          <li><div><b>Yeni sekme aç.</b> Program sekmelerinde <b>+ Program</b> → şablon olarak
+            <b>Oryantasyon (2 hafta)</b> seç, adını ver (örn. "Mart Dönemi").
+            <div class="sub">Şablon 11 günü, kahvaltı ve öğle yemeği etkinliklerini, fiziki/online ayrımını hazır getirir.</div></div></li>
+          <li><div><b>Başlangıç tarihini gir.</b> Araç çubuğundaki <b>Başlangıç</b> alanına ilk günün tarihini yaz.
+            <div class="sub">Tüm günlerin tarihleri otomatik hesaplanır. İkinci hafta bir hafta sonrasından başlar.</div></div></li>
+          <li><div><b>Eğitimleri yükle.</b> Elinde Excel varsa <b>İçe Aktar</b>. Yoksa <b>Oturum Ekle</b> ile tek tek gir.
+            <div class="sub">Eğitimler önce soldaki <b>Havuz</b>'a düşer — henüz güne yerleşmemiş demektir.</div></div></li>
+          <li><div><b>Eğitmen müsaitliğini işaretle.</b> Havuzdaki kartın üzerine gel, takvim ikonuna tıkla.
+            Açılan matriste eğitmenin müsait olduğu gün/blokları işaretle.
+            <div class="sub">Birden fazla eğitmen ekleyebilirsin; radyo düğmesiyle asıl eğitmeni seçersin.
+            Hiç işaret koymazsan eğitmen her zaman müsait sayılır.</div></div></li>
+          <li><div><b>Yerleştir.</b> Kartı sürükleyip günün sabah ya da öğleden sonra bloğuna bırak.
+            <div class="sub">Alternatif: kartın altındaki <b>Önerilen yerler</b> etiketlerinden birine tıkla — doğrudan oraya yerleşir.</div></div></li>
+          <li><div><b>Kontrol et.</b> <kbd>Ctrl</kbd>+<kbd>K</kbd> → <b>Planı denetle</b>.
+            <div class="sub">Boş kalan günler, kapasite aşımı, aynı saatte iki yerde olan eğitmen, eğitmeni atanmamış oturumlar listelenir.</div></div></li>
+          <li><div><b>Çıktı al.</b> <b>Görsel</b> ile PNG, <b>Excel</b> ile tablo, <b>Kartlar</b> görünümünden yazdırılabilir program.</div></li>
+        </ol>
+        <div class="note" style="margin-top:18px">
+          <b>Uyarılar ne anlama geliyor</b>
+          <p>“Hatalı hafta” uyarısı: online bir oturumu fiziki güne bırakmaya çalışıyorsun. “Süre sınırı aşıldı”:
+          o bloğa sığmıyor, yine de zorlayabilirsin. “Müsait görünmüyor”: eğitmenin matriste işaretli olmadığı bir slot.
+          Üçü de onay ister, hiçbiri seni engellemez.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- S2 -->
+    <article class="scen">
+      <div class="scen-h">
+        <span class="tag">Senaryo B</span>
+        <div>
+          <h3>Sıfırdan bir gelişim programı kurmak</h3>
+          <p>Bir arkadaşın program planlayacak. Oryantasyondan tamamen bağımsız, kendi yapısıyla.</p>
+        </div>
+      </div>
+      <div class="scen-b">
+        <ol class="steps">
+          <li><div><b>+ Program</b> → <b>Gelişim Programı (1 hafta)</b> ya da <b>Atölye / Seminer (3 gün)</b> seç.
+            <div class="sub">Tamamen boş başlamak istersen <b>Boş Program</b>. Hiçbir varsayılan gelmez.</div></div></li>
+          <li><div><b>Programı anlat, taslağı yapay zekâ kursun.</b> Araç çubuğunda <b>Metinden Program</b>.
+            <div class="sub">Örnek: “3 günlük şube satış geliştirme programı. Sabahları teorik eğitim, öğleden sonraları vaka
+            çalışması. İlk gün açılış ve tanışma, son gün sunum ve değerlendirme. Eğitmenler Ali Veli ve Ayşe Demir.
+            Yer Bankacılık Üssü.” — gün sayısı, bloklar ve oturumlar oluşturulur.</div></div></li>
+          <li><div><b>Yapıyı kendine göre ayarla.</b> Kurulum sekmesinden hafta/gün ekle, blok saatlerini değiştir,
+            gün türlerini yeniden adlandır.
+            <div class="sub">Örneğin yarım günlük bir seminer için: öğleden sonra bloğunu sil, sabah bloğunun kapasitesini 4 yap.</div></div></li>
+          <li><div><b>Kendi alanlarını ekle.</b> Kurulum → <b>Oturum Alanları</b> → <b>+ Alan</b>.
+            <div class="sub">“Zoom bağlantısı”, “Ön koşul”, “Bütçe kodu”, “Kontenjan” gibi. Her alan için
+            kartta ve takvimde görünüp görünmeyeceğini ayrı ayrı seçersin.</div></div></li>
+          <li><div><b>Havuzu dağıt.</b> Takvim görünümünde havuz başlığındaki <b>Dağıt</b> düğmesi,
+            müsaitlik ve kapasiteye bakarak hepsini uygun yerlere yerleştirir.
+            <div class="sub">Beğenmediğini sürükleyip düzeltirsin.</div></div></li>
+          <li><div><b>Kartlar görünümüne geç</b> ve <b>Açıklamaları Üret</b> ile her eğitime tanıtım metni ekle.
+            <div class="sub">Sonuç, katılımcıya gönderilebilecek bir program dokümanı olur.</div></div></li>
+        </ol>
+      </div>
+    </article>
+
+    <!-- S3 -->
+    <article class="scen">
+      <div class="scen-h">
+        <span class="tag">Senaryo C</span>
+        <div>
+          <h3>Elindeki listeyi içeri almak</h3>
+          <p>Excel, e-posta, Word tablosu — biçimi ne olursa olsun.</p>
+        </div>
+      </div>
+      <div class="scen-b">
+        <ol class="steps">
+          <li><div><b>İçe Aktar</b>'a bas. İki yol var: dosya yüklemek ya da metin yapıştırmak.</div></li>
+          <li><div><b>Excel / CSV yolu.</b> Dosyayı seç. Sütun başlıkları otomatik tanınır —
+            “Eğitim Adı”, “Süre”, “Eğitmen”, “Tür”, “Gün”, “Saat” ve senin tanımladığın alan adları.
+            <div class="sub">Başlıklar tanınmazsa yapay zekâ devreye girip sütunları kendisi eşleştirir.
+            <span class="badge b-ai">yapay zekâ</span></div></div></li>
+          <li><div><b>Yapıştırma yolu.</b> Metin kutusuna listeyi olduğu gibi yapıştır, <b>AI ile Ayrıştır</b>'a bas.
+            <div class="sub">“Pazartesi 09:30 Bankacılığa Giriş - Ahmet Yılmaz - 3 saat” gibi düz satırlardan
+            oturumları, saatleri ve eğitmenleri çıkarır. <span class="badge b-ai">yapay zekâ</span></div></div></li>
+          <li><div><b>Üzerine mi eklensin, yerine mi geçsin?</b> Alttaki kutucukla seç.</div></li>
+          <li><div><b>Sonucu kontrol et.</b> Tablo görünümünde hepsini bir arada gör, eksikleri düzelt.</div></li>
+        </ol>
+        <div class="note gold" style="margin-top:18px">
+          <b>Aynı eğitimin birden fazla eğitmeni varsa</b>
+          <p>Excel'de <code>Egitmen</code>, <code>Egitmen_2</code>, <code>Egitmen_3</code>… şeklinde sütunlar açabilirsin;
+          hepsi alternatif eğitmen olarak eklenir. Tek hücrede virgülle ayırmak da olur.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- S4 -->
+    <article class="scen">
+      <div class="scen-h">
+        <span class="tag">Senaryo D</span>
+        <div>
+          <h3>Katılımcı listesi çıkarmak</h3>
+          <p>Aday listesiyle personel listesini birleştirip temiz bir katılımcı tablosu üretmek.</p>
+        </div>
+      </div>
+      <div class="scen-b">
+        <ol class="steps">
+          <li><div><b>Katılımcılar</b> sekmesine geç.</div></li>
+          <li><div><b>Aday listesini yükle</b> (Katıl Bize / başvuru dosyası). Sütunlar otomatik tanınır ve
+            altta eşleştirme kutuları çıkar.
+            <div class="sub">Yanlış eşleşme varsa açılır listelerden düzelt. Ya da <b>AI ile otomatik eşle</b>'ye bas.
+            <span class="badge b-ai">yapay zekâ</span></div></div></li>
+          <li><div><b>Personel listesini yükle</b> (opsiyonel). Sicil numarası ve kurum e-postası buradan gelir,
+            TC kimlik numarası üzerinden eşleşir.</div></li>
+          <li><div><b>Tarih aralığı ver</b> (opsiyonel) — sadece o aralıkta eğitim tarihi olan adaylar alınır.</div></li>
+          <li><div><b>Listeyi Oluştur.</b> Tablo dolar. Şube/GM ayrımı organizasyon adına bakılarak otomatik yapılır.</div></li>
+          <li><div><b>Eksikleri kapat.</b> Üç düğme:
+            <div class="sub">
+            <b>Akıllı Eşleştir</b> — sicil ya da kurum e-postası boş kalanları isimden eşleştirir; önce yerel
+            karşılaştırma yapar, kalanları yapay zekâya sorar. <span class="badge b-ai">yapay zekâ</span><br>
+            <b>GM/Şube Sınıflandır</b> — birim adlarını gerçekten anlayarak sınıflandırır ve yazımlarını düzeltir
+            (“ANKARA KIZILAY SB.” → Şube, “Ankara Kızılay Şubesi”). <span class="badge b-ai">yapay zekâ</span><br>
+            <b>Eksik Veri Raporu</b> — hatalı TC, eksik e-posta/telefon, tekrar eden kayıtları listeler ve
+            sorunlu kayıtları Excel olarak indirtir. <span class="badge b-ai">yapay zekâ</span></div></div></li>
+          <li><div><b>Excel</b> ile listeyi indir.</div></li>
+        </ol>
+      </div>
+    </article>
+
+    <!-- S5 -->
+    <article class="scen">
+      <div class="scen-h">
+        <span class="tag">Senaryo E</span>
+        <div>
+          <h3>Programı paylaşmak</h3>
+          <p>Aynı plandan beş farklı çıktı — kime gönderdiğine göre seç.</p>
+        </div>
+      </div>
+      <div class="scen-b">
+        <div class="tablewrap">
+          <table>
+            <caption>Hangi çıktı, kime</caption>
+            <thead><tr><th>Çıktı</th><th>Nasıl</th><th>Kime uygun</th></tr></thead>
+            <tbody>
+              <tr><td>Kart dokümanı</td><td>Kartlar görünümü → <b>Görsel</b> ya da <b>Yazdır</b></td>
+                <td>Katılımcılar. Logolu, sadece dolu günleri gösterir</td></tr>
+              <tr><td>Ajanda metni</td><td>Ajanda görünümü → <b>Metni Kopyala</b></td>
+                <td>E-posta gövdesine yapıştırmak için</td></tr>
+              <tr><td>Takvim görseli</td><td>Araç çubuğu → <b>Görsel</b></td>
+                <td>Ekibe planın bütününü göstermek için</td></tr>
+              <tr><td>Excel</td><td>Araç çubuğu → <b>Excel</b></td>
+                <td>Raporlama, arşiv, başka sisteme aktarım</td></tr>
+              <tr><td>Davet e-postası</td><td>Araç çubuğu → <b>Davet Metni</b> <span class="badge b-ai">yapay zekâ</span></td>
+                <td>Konu satırıyla birlikte hazır metin</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note" style="margin-top:18px">
+          <b>Davet metnini kişiselleştir</b>
+          <p>Kime (katılımcı / eğitmen / yönetici), hangi üslupla ve hangi ek notlarla yazılacağını seçebilirsin.
+          “Program tablosunu ekle” işaretliyse gün gün akış metnin içine girer. İmza yerine
+          <code>[Ad Soyad]</code> yer tutucusu bırakılır.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- S6 -->
+    <article class="scen">
+      <div class="scen-h">
+        <span class="tag">Senaryo F</span>
+        <div>
+          <h3>Kendi program tipini kurmak</h3>
+          <p>Hazır şablonların hiçbiri uymuyorsa. Örnek: her gün üç oturumlu, iki aralı, 4 haftalık bir sertifika programı.</p>
+        </div>
+      </div>
+      <div class="scen-b">
+        <ol class="steps">
+          <li><div><b>+ Program → Boş Program.</b></div></li>
+          <li><div><b>Zaman bloklarını kur.</b> Kurulum → Zaman Blokları. Her satır bir dilim:
+            adı, başlangıç, bitiş, türü (ders/ara) ve ders bloklarında kapasite.
+            <div class="sub">Sıra önemlidir — takvimde yukarıdan aşağıya bu sırayla görünür.</div></div></li>
+          <li><div><b>Gün türlerini tanımla.</b> Rengini ve varsayılan lokasyonunu ver.
+            Örn. “Kampüs” (yeşil, Bankacılık Üssü), “Uzaktan” (mor, MS Teams).</div></li>
+          <li><div><b>Hafta ve günleri ekle.</b> Kurulum → Haftalar ve Günler → <b>+ Hafta</b>, sonra her haftaya <b>+ Gün</b>.
+            <div class="sub">Gün adına tıklayınca tür, lokasyon, özel tarih ve “program dışı” seçeneği açılır.
+            Resmî tatilleri program dışı işaretle — öneri motoru ve dağıtım onları atlar.</div></div></li>
+          <li><div><b>Alanları belirle.</b> İhtiyacın olmayanı sil, ihtiyacın olanı ekle.
+            <div class="sub">Çekirdek alanlar (Eğitim Adı, Süre, Tür, Eğitmen) silinemez, adları değiştirilebilir.</div></div></li>
+          <li><div><b>Davranışı ayarla.</b> Tür eşleşmesi zorunlu olsun mu, öneriler gösterilsin mi,
+            kapasite toleransı kaç saat.</div></li>
+          <li><div><b>Şablon gibi sakla.</b> Kurduğun yapıyı her dönem yeniden kurmamak için
+            sekme çubuğundaki <b>Kopyala</b>'yı kullan — yapı aynen gelir, içini yeniden doldurursun.</div></div></li>
+        </ol>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section id="referans">
+  <h2 class="sec"><span class="n">05</span> Fonksiyon referansı</h2>
+  <p class="sec-lede">Her düğme ve her etkileşim, bulunduğu yere göre.</p>
+
+  <div class="stack" style="margin-top:24px">
+
+    <div class="tablewrap">
+      <table>
+        <caption>Başlık ve program sekmeleri</caption>
+        <thead><tr><th>İşlev</th><th>Ne yapar</th></tr></thead>
+        <tbody>
+          <tr><td>Görünüm düğmeleri</td><td>Takvim, Kartlar, Ajanda, Tablo, Katılımcılar, Kurulum arasında geçiş</td></tr>
+          <tr><td>Yapay Zekâ</td><td>Komut çubuğunu açar. <kbd>Ctrl</kbd>+<kbd>K</kbd> ile de açılır</td></tr>
+          <tr><td>Konuşma balonu</td><td>Plan asistanını sağdan açar — plan hakkında soru sorarsın</td></tr>
+          <tr><td>Ay / güneş</td><td>Açık ve koyu tema arası geçiş. Tercihin hatırlanır</td></tr>
+          <tr><td>Sekmeye tıklama</td><td>O programa geçer</td></tr>
+          <tr><td>Sekme adına çift tıklama</td><td>Yeniden adlandırır</td></tr>
+          <tr><td>Sekmeyi sürükleme</td><td>Sıralamayı değiştirir</td></tr>
+          <tr><td>Kopyala</td><td>Aktif programın birebir kopyasını yeni sekme olarak açar</td></tr>
+          <tr><td>Yedek Al / Yedek Yükle</td><td>Tüm programları JSON dosyasına yazar / geri yükler</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <caption>Araç çubuğu — planlama görünümlerinde</caption>
+        <thead><tr><th>İşlev</th><th>Ne yapar</th></tr></thead>
+        <tbody>
+          <tr><td>Başlangıç</td><td>İlk günün tarihi. Diğer tüm günler buradan hesaplanır; her hafta bir sonraki haftadan başlar</td></tr>
+          <tr><td>İçe Aktar</td><td>Excel/CSV yükleme ve serbest metin yapıştırma penceresi</td></tr>
+          <tr><td>Oturum Ekle</td><td>Boş bir oturum oluşturup düzenleme penceresini açar</td></tr>
+          <tr><td>Metinden Program</td><td>Tarife göre program taslağı üretir <span class="badge b-ai">yapay zekâ</span></td></tr>
+          <tr><td>Sayaç</td><td>Oturum sayısı, kaçının yerleştiği, toplam saat, katılımcı sayısı</td></tr>
+          <tr><td>Özet</td><td>Yönetici brifingi metni üretir <span class="badge b-ai">yapay zekâ</span></td></tr>
+          <tr><td>Davet Metni</td><td>Kitleye ve üsluba göre e-posta metni üretir <span class="badge b-ai">yapay zekâ</span></td></tr>
+          <tr><td>Görsel</td><td>Aktif görünümün PNG çıktısını indirir</td></tr>
+          <tr><td>Excel</td><td>Programı tüm alanlarıyla xlsx olarak indirir</td></tr>
+          <tr><td>Yazdır</td><td>Tarayıcının yazdırma penceresi. Araç çubukları çıktıda gizlenir</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <caption>Takvim görünümü</caption>
+        <thead><tr><th>Etkileşim</th><th>Sonuç</th></tr></thead>
+        <tbody>
+          <tr><td>Kartı sürükle</td><td>Bir bloğa bırakır. Havuza geri sürüklersen yerleşimi kaldırır</td></tr>
+          <tr><td>Kartın üstüne bırak</td><td>Aynı blok içinde sıralamayı değiştirir</td></tr>
+          <tr><td>Karta çift tıkla</td><td>Oturum düzenleme penceresini açar</td></tr>
+          <tr><td>Eğitmen adına çift tıkla</td><td>Yerinde düzenler</td></tr>
+          <tr><td>Süre rozetine çift tıkla</td><td>Süreyi yerinde değiştirir</td></tr>
+          <tr><td>Kart takvim ikonu</td><td>Eğitmen müsaitlik matrisini açar</td></tr>
+          <tr><td>Boş bloğa çift tıkla</td><td>O gün ve bloğa yeni oturum ekler</td></tr>
+          <tr><td>Ara bloğuna çift tıkla</td><td>O güne özel etkinlik tanımlar (kahvaltı, yemek, açılış)</td></tr>
+          <tr><td>Gün başlığı ikonları</td><td>Günü düzenler ya da siler (üzerine gelince görünür)</td></tr>
+          <tr><td>Gün altındaki kutu</td><td>O günün lokasyonunu değiştirir</td></tr>
+          <tr><td>Günün alt çizgisi</td><td>Doluluk göstergesi: yeşil normal, turuncu dolmak üzere, kırmızı aşım</td></tr>
+          <tr><td>Hafta adına çift tıkla</td><td>Hafta başlığını değiştirir</td></tr>
+          <tr><td>Havuz → Dağıt</td><td>Havuzdaki oturumları kurallara uyan ilk uygun yerlere dağıtır <span class="badge b-off">çevrimdışı</span></td></tr>
+          <tr><td>Önerilen yerler</td><td>Havuz kartlarında çıkar; etikete tıklayınca doğrudan oraya yerleşir</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <caption>Oturum penceresi ve müsaitlik matrisi</caption>
+        <thead><tr><th>Alan</th><th>Ne yapar</th></tr></thead>
+        <tbody>
+          <tr><td>Eğitim Adı, Süre, Tür</td><td>Çekirdek bilgiler. Süre gün kapasitesine ulaşırsa oturum tam güne döner</td></tr>
+          <tr><td>Yerleşim</td><td>Gün ve blok seçimi. “Havuzda bırak” seçilirse takvimden çıkar</td></tr>
+          <tr><td>Eğitmenler</td><td>İstediğin kadar eğitmen. Radyo düğmesi asıl eğitmeni belirler; kartlarda o görünür</td></tr>
+          <tr><td>Müsaitlik Matrisi</td><td>Satır eğitmen, sütun gün×blok. Hücreye tıkla → müsait. Boş bırakırsan her zaman müsait sayılır</td></tr>
+          <tr><td>Diğer alanlar</td><td>Kurulumda tanımladığın alanlar burada form olarak çıkar</td></tr>
+          <tr><td>Açıklamayı AI ile üret</td><td>Eğitim adından tanım, kazanımlar ve hedef kitle yazar <span class="badge b-ai">yapay zekâ</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <caption>Kartlar, Ajanda ve Tablo</caption>
+        <thead><tr><th>İşlev</th><th>Ne yapar</th></tr></thead>
+        <tbody>
+          <tr><td>Kart başlığı</td><td>Logo, program adı, tarih aralığı, toplam saat, oturum ve katılımcı sayısı</td></tr>
+          <tr><td>Gün grupları</td><td>Sadece eğitim olan günler. Boş günler hiç görünmez</td></tr>
+          <tr><td>Kart içeriği</td><td>Saat, süre, başlık, açıklama, eğitmen, platform ve “kartta göster” işaretli alanlar</td></tr>
+          <tr><td>Açıklamaları Üret</td><td>Açıklaması boş olan tüm yerleşmiş oturumlar için toplu metin üretir <span class="badge b-ai">yapay zekâ</span></td></tr>
+          <tr><td>Kart üzerindeki ikonlar</td><td>Kıvılcım: o oturuma açıklama üretir · kalem: oturumu düzenler</td></tr>
+          <tr><td>Ajanda → Metni Kopyala</td><td>Programın düz metin hâlini panoya alır</td></tr>
+          <tr><td>Tablo → arama</td><td>Tüm alanlarda arar; başlık, eğitmen, açıklama fark etmez</td></tr>
+          <tr><td>Tablo satır ikonları</td><td>Oturumu düzenler ya da siler</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 06 ============ -->
+<section id="kurulum">
+  <h2 class="sec"><span class="n">06</span> Kurulum sekmesi</h2>
+  <p class="sec-lede">Programın iskeleti. Buradaki her ayar sadece <b>aktif programı</b> etkiler — diğer sekmeler kendi kurulumlarını korur.</p>
+
+  <div class="tablewrap" style="margin-top:24px">
+    <table>
+      <caption>Paneller</caption>
+      <thead><tr><th>Panel</th><th>İçindekiler</th></tr></thead>
+      <tbody>
+        <tr><td>Program Bilgileri</td><td>Ad, kurum, sorumlu, başlangıç tarihi, not. Not alanı yapay zekâya bağlam olarak gider — programın amacını yazmak çıktı kalitesini artırır</td></tr>
+        <tr><td>Zaman Blokları</td><td>Günün dilimleri: ad, başlangıç, bitiş, tür (ders/ara), kapasite. Ders bloklarının kapasite toplamı günün toplam kapasitesidir</td></tr>
+        <tr><td>Gün Türleri</td><td>Renk, ad, varsayılan lokasyon, ikon. Kullanımda olan bir tür silinemez</td></tr>
+        <tr><td>Haftalar ve Günler</td><td>Hafta ve gün ekleme/silme. Gün rozetine tıkla: ad, tür, lokasyon, özel tarih, program dışı işareti</td></tr>
+        <tr><td>Oturum Alanları</td><td>Alan ekle/sil, adını ve tipini değiştir, kartta ve takvimde görünürlüğünü seç. Tipler: metin, uzun metin, sayı, tarih, bağlantı</td></tr>
+        <tr><td>Güne Özel Etkinlikler</td><td>Tanımlı tüm özel etkinlikler burada listelenir, metinleri düzenlenir ya da silinir</td></tr>
+        <tr><td>Davranış</td><td><b>Tür eşleşmesi zorunlu</b>: yanlış türdeki güne bırakınca uyarır (oryantasyonda açık olmalı) · <b>Yer önerisi</b>: havuz kartlarında öneri gösterir · <b>Kapasite toleransı</b>: bloğun kaç saat aşılmasına sessizce izin verileceği</td></tr>
+        <tr><td>Yapay Zekâ Bağlantısı</td><td>Servis adresi, deployment, API sürümü, anahtar ve açma/kapama. <b>Bağlantıyı Test Et</b> anında sonuç verir</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note gold" style="margin-top:20px">
+    <b>Sildiğinde ne olur</b>
+    <p>Gün, hafta ya da blok silindiğinde oradaki oturumlar <b>silinmez</b>, havuza geri döner.
+    Alan silindiğinde ise o alandaki veriler kaybolur — onay istenir.</p>
+  </div>
+</section>
+
+<!-- ============ 07 ============ -->
+<section id="ai">
+  <h2 class="sec"><span class="n">07</span> Yapay zekâ</h2>
+  <p class="sec-lede">On işlev, kurumun Azure OpenAI servisi üzerinden. Hepsi isteğe bağlıdır.</p>
+
+  <div class="stack" style="margin-top:24px">
+    <div class="note">
+      <b>Erişim yoksa uygulama çalışmaya devam eder</b>
+      <p>Planlama, sürükle-bırak, Excel, görsel çıktı, katılımcı listesi, öneriler, plan denetimi ve otomatik dağıtım
+      <b>hiçbiri internete ihtiyaç duymaz</b>. Servise ulaşılamadığında sadece yapay zekâ düğmeleri hata mesajı verir,
+      geri kalan her şey aynen çalışır. Kurulum sekmesinden yapay zekâyı tamamen kapatabilirsin.</p>
+    </div>
+
+    <div class="cols2">
+      <div class="tile"><h4>Metinden program oluşturma</h4>
+        <p>Programı kelimelerle anlat, gün yapısı ve oturumlar taslak olarak kurulsun.</p>
+        <div class="where">Araç çubuğu → Metinden Program</div></div>
+      <div class="tile"><h4>Akıllı içe aktarma</h4>
+        <p>Tanınmayan sütun başlıklarını eşleştirir; yapıştırılan serbest metinden oturum çıkarır.</p>
+        <div class="where">Araç çubuğu → İçe Aktar</div></div>
+      <div class="tile"><h4>Yönetici özeti</h4>
+        <p>Genel bakış, sayılarla program ve dikkat edilmesi gerekenler. Yerel denetim bulgularını da kullanır.</p>
+        <div class="where">Araç çubuğu → Özet</div></div>
+      <div class="tile"><h4>Davet e-postası</h4>
+        <p>Kitle, üslup ve ek notlara göre konu satırıyla birlikte hazır metin.</p>
+        <div class="where">Araç çubuğu → Davet Metni</div></div>
+      <div class="tile"><h4>Eğitim açıklaması</h4>
+        <p>Başlıktan tanım, kazanımlar ve hedef kitle. Tek tek ya da toplu.</p>
+        <div class="where">Kartlar → Açıklamaları Üret</div></div>
+      <div class="tile"><h4>Komut çubuğu</h4>
+        <p>Doğal dil komutunu plana uygular: taşı, boşalt, eğitmen ata, süre değiştir, lokasyon yaz, oturum ekle/sil.</p>
+        <div class="where">Ctrl + K</div></div>
+      <div class="tile"><h4>Plan asistanı</h4>
+        <p>Planı görerek soru yanıtlar: kaç saat online var, en yoğun gün hangisi, hangi eğitmen kaç saat veriyor.</p>
+        <div class="where">Başlıkta konuşma balonu</div></div>
+      <div class="tile"><h4>Akıllı isim eşleştirme</h4>
+        <p>Yazım ve Türkçe karakter farklarına rağmen katılımcıyı personel listesiyle eşler. Önce yerel, sonra AI.</p>
+        <div class="where">Katılımcılar → Akıllı Eşleştir</div></div>
+      <div class="tile"><h4>GM/Şube sınıflandırma</h4>
+        <p>Birimi gerçekten anlayarak sınıflandırır, adını düzgün yazımına çevirir.</p>
+        <div class="where">Katılımcılar → GM/Şube Sınıflandır</div></div>
+      <div class="tile"><h4>Eksik veri raporu</h4>
+        <p>Hatalı TC, eksik iletişim bilgisi, tekrar eden kayıt. Bulguları Excel olarak indirir.</p>
+        <div class="where">Katılımcılar → Eksik Veri Raporu</div></div>
+    </div>
+
+    <h3 style="margin-top:12px">Komut çubuğu nasıl kullanılır</h3>
+    <p class="prose" style="color:var(--ink-2)"><kbd>Ctrl</kbd>+<kbd>K</kbd> ile aç. Üstte hızlı işlemler listelenir;
+    yazmaya başladığında en üstte “bu komutu plana uygula” seçeneği çıkar. <kbd>↑</kbd> <kbd>↓</kbd> ile gez,
+    <kbd>Enter</kbd> ile çalıştır, <kbd>Esc</kbd> ile kapat.</p>
+    <ul class="plain" style="margin-top:14px">
+      <li><b>“Salı gününü boşalt”</b> — o günün tüm oturumlarını havuza alır</li>
+      <li><b>“Ürün Eğitimi'ni Çarşamba sabaha taşı”</b> — oturumu adıyla bulur ve taşır</li>
+      <li><b>“Perşembe lokasyonunu Teams yap”</b> — günün lokasyonunu değiştirir</li>
+      <li><b>“Mevzuat eğitiminin süresini 4 saat yap”</b></li>
+      <li><b>“Cuma gününü program dışı işaretle”</b> — resmî tatiller için</li>
+      <li><b>“Havuzdakileri dağıt”</b> — otomatik yerleştirmeyi çalıştırır</li>
+    </ul>
+    <p class="prose" style="color:var(--ink-2);margin-top:14px">Uygulanan her değişiklik pencerede madde madde listelenir.
+    Emin olunmayan komutlarda hiçbir işlem yapılmaz ve nedeni yazılır.</p>
+
+    <div class="note stop" style="margin-top:8px">
+      <b>Ne gönderiliyor, bilmen gereken</b>
+      <p>Yapay zekâ işlevlerini kullandığında programın içeriği (eğitim adları, eğitmenler, günler, saatler)
+      servise gider. Katılımcı işlevlerinde <b>ad-soyad ve birim bilgisi</b> de gider — sınıflandırma ve eşleştirme
+      bunu gerektirir. TC kimlik numarası hiçbir zaman gönderilmez. Kurumsal veri politikanıza göre değerlendir;
+      gerekiyorsa yapay zekâyı Kurulum'dan kapat.</p>
+    </div>
+
+    <div class="note warn">
+      <b>API anahtarı dosyanın içinde</b>
+      <p>Talep üzerine anahtar dosyaya gömülü hâlde gelir. Dosyayı paylaştığın herkes anahtarı kullanabilir.
+      Geniş dağıtım yapacaksan Kurulum sekmesinden anahtarı silip her kullanıcının kendi anahtarını girmesini isteyebilirsin.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 ============ -->
+<section id="veri">
+  <h2 class="sec"><span class="n">08</span> Veri ve yedekleme</h2>
+
+  <div class="cols2" style="margin-top:24px">
+    <div class="tile">
+      <h4>Veri nerede</h4>
+      <p>Tarayıcının yerel deposunda, o bilgisayarda. Sunucuya gitmez, dosyanın içine yazılmaz.
+      Aynı dosyayı başka bilgisayarda açarsan boş gelir.</p>
+    </div>
+    <div class="tile">
+      <h4>Ne zaman yedek al</h4>
+      <p>Bir dönem planını bitirdiğinde ve başkasına göndermeden önce. <b>Yedek Al</b> tüm programları
+      tek JSON dosyasına yazar.</p>
+    </div>
+    <div class="tile">
+      <h4>Veriyi kaybettiren durumlar</h4>
+      <p>Tarayıcı geçmişini “site verileriyle birlikte” temizlemek, gizli sekmede çalışmak,
+      dosyayı farklı bir klasöre taşıyıp oradan açmak.</p>
+    </div>
+    <div class="tile">
+      <h4>Başkasına devretmek</h4>
+      <p>Ona hem <code>takvim-planlayici.html</code> dosyasını hem de JSON yedeğini gönder.
+      O kişi dosyayı açıp <b>Yedek Yükle</b> desin.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:28px">Kısayollar</h3>
+  <dl class="keys" style="margin-top:14px">
+    <dt><kbd>Ctrl</kbd>+<kbd>K</kbd></dt><dd>Komut çubuğu</dd>
+    <dt><kbd>Esc</kbd></dt><dd>Açık pencereyi ya da komut çubuğunu kapatır</dd>
+    <dt><kbd>Enter</kbd></dt><dd>Yerinde düzenlemeyi onaylar · asistanda mesajı gönderir</dd>
+    <dt><kbd>Shift</kbd>+<kbd>Enter</kbd></dt><dd>Asistanda alt satıra geçer</dd>
+    <dt>Çift tıklama</dt><dd>Neredeyse her yerde düzenlemeyi açar: kart, eğitmen, süre, hafta adı, sekme adı, boş blok, ara bloğu</dd>
+  </dl>
+</section>
+
+<!-- ============ 09 ============ -->
+<section id="sorun">
+  <h2 class="sec"><span class="n">09</span> Sorun giderme</h2>
+
+  <div class="tablewrap" style="margin-top:24px">
+    <table>
+      <caption>Sık karşılaşılanlar</caption>
+      <thead><tr><th>Belirti</th><th>Sebep ve çözüm</th></tr></thead>
+      <tbody>
+        <tr><td>Yapay zekâ düğmeleri hata veriyor</td>
+          <td>Kurulum → <b>Bağlantıyı Test Et</b>. Kurum ağına ya da VPN'e bağlı olduğundan emin ol.
+          Servis erişilemezse planlama işlevleri etkilenmez</td></tr>
+        <tr><td>Tam gün oturum yerleşmiyor</td>
+          <td>O günde başka oturum var. Tam gün için gün tamamen boş olmalı — önce diğerlerini taşı</td></tr>
+        <tr><td>“Hatalı hafta” uyarısı</td>
+          <td>Oturumun türü ile günün türü farklı. Ya oturumun türünü değiştir ya da
+          Kurulum → Davranış → tür eşleşmesi zorunluluğunu kapat</td></tr>
+        <tr><td>Öneri çıkmıyor, “uygun boş yer yok”</td>
+          <td>Eğitmen müsaitliği çok dar ya da tüm bloklar dolu. Matristen müsaitliği genişlet
+          veya kapasite toleransını artır</td></tr>
+        <tr><td>Excel'deki sütunlar tanınmadı</td>
+          <td>Başlık satırı beklenenden farklı. Yapay zekâ eşleştirmesi devreye girer;
+          kapalıysa başlıkları “Eğitim Adı”, “Süre”, “Eğitmen” olarak düzelt</td></tr>
+        <tr><td>Katılımcılarda sicil/kurum e-postası boş</td>
+          <td>Personel listesi yüklenmemiş ya da TC eşleşmemiş. Listeyi yükleyip
+          <b>Akıllı Eşleştir</b>'i çalıştır</td></tr>
+        <tr><td>Görsel indirilmiyor</td>
+          <td>Çok büyük bir takvim olabilir. Kartlar görünümünden ya da <b>Yazdır → PDF olarak kaydet</b> ile dene</td></tr>
+        <tr><td>Metin kopyalanmıyor</td>
+          <td>Kurum politikası pano erişimini kısıtlamış olabilir. Metni fareyle seçip
+          <kbd>Ctrl</kbd>+<kbd>C</kbd> ile kopyala</td></tr>
+        <tr><td>Program kayboldu</td>
+          <td>Tarayıcı verileri temizlenmiş olabilir. En son <b>Yedek Yükle</b> ile geri al</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  Program Planlayıcı · Kuveyt Türk Akademi · Bu kılavuz uygulamanın güncel sürümünü anlatır.
+</footer>
