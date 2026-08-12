@@ -361,8 +361,13 @@ function renderSetup() {
           <div class="field"><label class="lbl">API Version</label><input value="${esc(ai.apiVersion)}" onchange="DB.settings.ai.apiVersion=this.value;save()"></div>
         </div>
         <div class="field"><label class="lbl">API Anahtarı</label><input type="password" value="${esc(ai.key)}" onchange="DB.settings.ai.key=this.value;save()"></div>
-        <button class="btn" onclick="testAI()"><svg class="ic"><use href="#i-refresh"/></svg> Bağlantıyı Test Et</button>
-        <span id="aiTestOut" class="hint"></span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn" onclick="testAI()"><svg class="ic"><use href="#i-refresh"/></svg> Bağlantıyı Test Et</button>
+          <button class="btn" onclick="aiDiagnose()"><svg class="ic"><use href="#i-alert"/></svg> Tanılama Raporu</button>
+        </div>
+        <p id="aiTestOut" class="hint" style="margin-top:10px"></p>
+        <p class="hint" style="margin-top:8px">Bağlantı kurulamıyorsa <b>Tanılama Raporu</b> sorunun ağda mı,
+        anahtarda mı yoksa tarayıcıda mı olduğunu tespit eder ve yöneticine iletebileceğin bir metin üretir.</p>
       </div>
     </div>
    </div>

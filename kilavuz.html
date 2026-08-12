@@ -673,7 +673,9 @@ footer{padding:30px 44px 60px;max-width:1240px;margin:0 auto;color:var(--ink-3);
         <tr><td>Oturum Alanları</td><td>Alan ekle/sil, adını ve tipini değiştir, kartta ve takvimde görünürlüğünü seç. Tipler: metin, uzun metin, sayı, tarih, bağlantı</td></tr>
         <tr><td>Güne Özel Etkinlikler</td><td>Tanımlı tüm özel etkinlikler burada listelenir, metinleri düzenlenir ya da silinir</td></tr>
         <tr><td>Davranış</td><td><b>Tür eşleşmesi zorunlu</b>: yanlış türdeki güne bırakınca uyarır (oryantasyonda açık olmalı) · <b>Yer önerisi</b>: havuz kartlarında öneri gösterir · <b>Kapasite toleransı</b>: bloğun kaç saat aşılmasına sessizce izin verileceği</td></tr>
-        <tr><td>Yapay Zekâ Bağlantısı</td><td>Servis adresi, deployment, API sürümü, anahtar ve açma/kapama. <b>Bağlantıyı Test Et</b> anında sonuç verir</td></tr>
+        <tr><td>Yapay Zekâ Bağlantısı</td><td>Servis adresi, deployment, API sürümü, anahtar ve açma/kapama.
+          <b>Bağlantıyı Test Et</b> anında sonuç verir; <b>Tanılama Raporu</b> bağlantının hangi aşamada
+          kesildiğini tespit edip paylaşılabilir bir metin üretir</td></tr>
       </tbody>
     </table>
   </div>
@@ -809,8 +811,16 @@ footer{padding:30px 44px 60px;max-width:1240px;margin:0 auto;color:var(--ink-3);
       <thead><tr><th>Belirti</th><th>Sebep ve çözüm</th></tr></thead>
       <tbody>
         <tr><td>Yapay zekâ düğmeleri hata veriyor</td>
-          <td>Kurulum → <b>Bağlantıyı Test Et</b>. Kurum ağına ya da VPN'e bağlı olduğundan emin ol.
-          Servis erişilemezse planlama işlevleri etkilenmez</td></tr>
+          <td>Kurulum → <b>Tanılama Raporu</b>. Sorunun ağda mı, anahtarda mı, tarayıcıda mı olduğunu
+          adım adım tespit eder ve yöneticine iletebileceğin bir metin üretir. Planlama işlevleri bundan etkilenmez</td></tr>
+        <tr><td>“Bağlantı zaman aşımına uğradı”</td>
+          <td>Sunucuya ağ üzerinden hiç ulaşılamıyor — anahtar ya da uygulama sorunu değil.
+          VPN'e bağlan ve tekrar dene; sürerse Tanılama Raporu'nu servis yöneticisine ilet.
+          Sorulacak soru: bu adrese son kullanıcı bilgisayarlarından tarayıcı üzerinden erişim açık mı,
+          IP kısıtı ya da proxy gereksinimi var mı</td></tr>
+        <tr><td>Konsolda “Unsafe attempt to load URL … file: URLs are treated as unique security origins”</td>
+          <td>Zararsız. Dosya doğrudan diskten açıldığında tarayıcının ikon tanımları için verdiği bilgi mesajı.
+          Uygulamanın çalışmasını etkilemez</td></tr>
         <tr><td>Tam gün oturum yerleşmiyor</td>
           <td>O günde başka oturum var. Tam gün için gün tamamen boş olmalı — önce diğerlerini taşı</td></tr>
         <tr><td>“Hatalı hafta” uyarısı</td>

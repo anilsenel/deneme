@@ -1863,8 +1863,13 @@ function renderSetup() {
           <div class="field"><label class="lbl">API Version</label><input value="${esc(ai.apiVersion)}" onchange="DB.settings.ai.apiVersion=this.value;save()"></div>
         </div>
         <div class="field"><label class="lbl">API Anahtarı</label><input type="password" value="${esc(ai.key)}" onchange="DB.settings.ai.key=this.value;save()"></div>
-        <button class="btn" onclick="testAI()"><svg class="ic"><use href="#i-refresh"/></svg> Bağlantıyı Test Et</button>
-        <span id="aiTestOut" class="hint"></span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn" onclick="testAI()"><svg class="ic"><use href="#i-refresh"/></svg> Bağlantıyı Test Et</button>
+          <button class="btn" onclick="aiDiagnose()"><svg class="ic"><use href="#i-alert"/></svg> Tanılama Raporu</button>
+        </div>
+        <p id="aiTestOut" class="hint" style="margin-top:10px"></p>
+        <p class="hint" style="margin-top:8px">Bağlantı kurulamıyorsa <b>Tanılama Raporu</b> sorunun ağda mı,
+        anahtarda mı yoksa tarayıcıda mı olduğunu tespit eder ve yöneticine iletebileceğin bir metin üretir.</p>
       </div>
     </div>
    </div>
@@ -2276,35 +2281,153 @@ function aiURL() {
    header — klasik api-key başlığı. Preflight gerektirir; ancak servis tarafında
            CORS açıksa veya sayfa aynı origin'den sunuluyorsa çalışır.
    Başarılı olan mod hatırlanır.                                              */
+const AI_TIMEOUT = 30000;   // tek bir denemenin üst sınırı (ms)
+
+function timedSignal(ms) {
+  const c = new AbortController();
+  const t = setTimeout(() => c.abort(), ms);
+  return { signal: c.signal, clear: () => clearTimeout(t) };
+}
+
+async function aiCall(mode, body, ms = AI_TIMEOUT) {
+  const a = DB.settings.ai, base = aiURL();
+  const g = timedSignal(ms), t0 = Date.now();
+  try {
+    const res = mode === 'query'
+      ? await fetch(`${base}&subscription-key=${encodeURIComponent(a.key)}`,
+        { method: 'POST', body: new Blob([JSON.stringify(body)]), signal: g.signal })
+      : await fetch(base, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'api-key': a.key },
+        body: JSON.stringify(body), signal: g.signal
+      });
+    return { res, ms: Date.now() - t0 };
+  } catch (e) {
+    return { err: e, ms: Date.now() - t0, aborted: e.name === 'AbortError' };
+  } finally { g.clear(); }
+}
+
+/* Ağ hatasının türünü ayırt eder: zaman aşımı mı, anında ret mi?
+   İkisi de JavaScript'e aynı istisnayla gelir, ayrımı süre yapar.        */
+function netError(r) {
+  if (r.aborted || r.ms > AI_TIMEOUT - 1500) {
+    return new Error(`Bağlantı zaman aşımına uğradı (${Math.round(r.ms / 1000)} sn). ` +
+      'Servise ağ üzerinden hiç ulaşılamıyor — kurum ağı, güvenlik duvarı ya da VPN engelliyor olabilir. ' +
+      'Kurulum sekmesindeki “Tanılama Raporu” ile ayrıntıyı görebilirsin.');
+  }
+  return new Error('İstek gönderilemedi. Bilgisayarın ağ bağlantısı kapalı olabilir ya da ' +
+    'tarayıcı isteği engelledi. Kurulum sekmesindeki “Tanılama Raporu” nedenini gösterir.');
+}
+
 async function aiFetch(body) {
   const a = DB.settings.ai;
-  const base = aiURL();
   const modes = a.authMode === 'header' ? ['header', 'query'] : ['query', 'header'];
   let last = null;
-  for (const mode of modes) {
-    let res;
-    try {
-      res = mode === 'query'
-        ? await fetch(`${base}&subscription-key=${encodeURIComponent(a.key)}`,
-          { method: 'POST', body: new Blob([JSON.stringify(body)]) })
-        : await fetch(base, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'api-key': a.key },
-          body: JSON.stringify(body)
-        });
-    } catch (e) {
-      last = new Error('Servise ulaşılamadı. Ağ/VPN bağlantını kontrol et — uygulamanın geri kalanı çevrimdışı çalışmaya devam eder.');
+  for (let i = 0; i < modes.length; i++) {
+    const r = await aiCall(modes[i], body, i === 0 ? AI_TIMEOUT : 15000);
+    if (r.err) {
+      last = netError(r);
+      // Zaman aşımı ağ seviyesinde bir engeldir; ikinci yöntem de aynı adrese
+      // gideceği için tekrar beklemenin anlamı yok.
+      if (r.aborted || r.ms > AI_TIMEOUT - 1500) throw last;
       continue;
     }
-    if (res.ok) {
-      if (a.authMode !== mode) { a.authMode = mode; save(); }
-      return res.json();
+    if (r.res.ok) {
+      if (a.authMode !== modes[i]) { a.authMode = modes[i]; save(); }
+      return r.res.json();
     }
-    const t = await res.text().catch(() => '');
-    last = new Error(`Servis hatası (${res.status}). ${t.slice(0, 180)}`);
-    if (![401, 403, 404].includes(res.status)) throw last;
+    const t = await r.res.text().catch(() => '');
+    last = new Error(`Servis hatası (${r.res.status}). ${t.slice(0, 180)}`);
+    if (![401, 403, 404].includes(r.res.status)) throw last;
   }
   throw last;
+}
+
+/* ---------- tanılama ---------- */
+async function aiDiagnose() {
+  const a = DB.settings.ai;
+  let host = '(adres okunamadı)';
+  try { host = new URL(a.endpoint).origin; } catch (e) { }
+  const lines = [];
+  const put = (k, v) => { lines.push(`${k}: ${v}`); paint(); };
+  const paint = () => {
+    const el = $('diagOut'); if (!el) return;
+    el.textContent = lines.join('\n');
+  };
+
+  openModal({
+    title: 'Tanılama Raporu', sub: 'Bağlantının nerede kesildiğini adım adım tespit eder', icon: 'i-alert', size: 'modal-lg',
+    body: `<div class="ai-busy"><span class="spin"></span> Testler çalışıyor, 1 dakika kadar sürebilir…</div>
+      <pre class="ai-out" id="diagOut" style="margin-top:14px;font-family:ui-monospace,Consolas,monospace;font-size:12px"></pre>`,
+    foot: `<button class="btn" onclick="closeModal()">Kapat</button>
+      <button class="btn btn-primary" onclick="copyText($('diagOut').textContent)"><svg class="ic"><use href="#i-copy"/></svg> Raporu Kopyala</button>`
+  });
+
+  put('Tarih', new Date().toLocaleString('tr-TR'));
+  put('Sayfa adresi', location.href.slice(0, 120));
+  put('Tarayıcı çevrimiçi mi', navigator.onLine ? 'evet' : 'HAYIR — bilgisayarın ağ bağlantısı kapalı');
+  put('Servis adresi', host);
+  put('Deployment', a.deployment + ' · ' + a.apiVersion);
+  put('Anahtar', a.key ? a.key.slice(0, 4) + '…' + a.key.slice(-4) + ` (${a.key.length} karakter)` : 'GİRİLMEMİŞ');
+  lines.push('');
+
+  // 1) Sunucuya ağ üzerinden erişilebiliyor mu? (yanıt okunmaz, sadece bağlantı denenir)
+  put('1 · Sunucuya erişim', 'deneniyor…');
+  const g = timedSignal(15000); const t0 = Date.now();
+  let reach = false;
+  try {
+    await fetch(host + '/', { mode: 'no-cors', cache: 'no-store', signal: g.signal });
+    reach = true;
+    lines[lines.length - 1] = `1 · Sunucuya erişim: BAŞARILI (${Date.now() - t0} ms)`;
+  } catch (e) {
+    lines[lines.length - 1] = `1 · Sunucuya erişim: BAŞARISIZ (${Math.round((Date.now() - t0) / 1000)} sn, ${e.name})`;
+  } finally { g.clear(); paint(); }
+
+  // 2) Gerçek istek — adres satırında anahtar
+  const probe = { messages: [{ role: 'user', content: 'test' }], max_completion_tokens: 5 };
+  put('2 · İstek (adres satırı yöntemi)', 'deneniyor…');
+  const r1 = await aiCall('query', probe);
+  lines[lines.length - 1] = `2 · İstek (adres satırı yöntemi): ` +
+    (r1.err ? `BAŞARISIZ — ${r1.aborted ? 'zaman aşımı' : r1.err.name} (${Math.round(r1.ms / 1000)} sn)`
+      : `HTTP ${r1.res.status} (${r1.ms} ms)`);
+  paint();
+
+  // 3) Gerçek istek — api-key başlığı (preflight gerektirir)
+  put('3 · İstek (api-key başlığı)', 'deneniyor…');
+  const r2 = await aiCall('header', probe, 15000);
+  lines[lines.length - 1] = `3 · İstek (api-key başlığı): ` +
+    (r2.err ? `BAŞARISIZ — ${r2.aborted ? 'zaman aşımı' : r2.err.name} (${Math.round(r2.ms / 1000)} sn)`
+      : `HTTP ${r2.res.status} (${r2.ms} ms)`);
+  paint();
+
+  // Sonuç
+  lines.push('', '─── DEĞERLENDİRME ───');
+  const ok1 = r1.res && r1.res.ok, ok2 = r2.res && r2.res.ok;
+  if (ok1 || ok2) {
+    lines.push('Bağlantı çalışıyor. Yapay zekâ özellikleri kullanılabilir.');
+  } else if (!navigator.onLine) {
+    lines.push('Bilgisayarın ağ bağlantısı kapalı. Önce ağa bağlan.');
+  } else if (!reach) {
+    lines.push(
+      'Sunucuya ağ seviyesinde hiç ulaşılamıyor. Bu bir uygulama ya da anahtar sorunu DEĞİL.',
+      'Olası nedenler:',
+      '  • Kurum güvenlik duvarı bu adresi son kullanıcı bilgisayarlarına kapatmış',
+      '  • VPN bağlantısı gerekiyor ve bağlı değilsin',
+      '  • Servis yalnızca sunucu ağından erişime açık (IP kısıtı)',
+      '  • Tarayıcının kullandığı vekil sunucu (proxy) bu adresi geçirmiyor',
+      'Yapılacak: Bu raporu servis yöneticisine ilet ve şunu sor —',
+      '  “Bu APIM adresine son kullanıcı bilgisayarlarından, tarayıcı üzerinden erişim',
+      '   açık mı? IP kısıtı ya da proxy gereksinimi var mı?”');
+  } else if (r1.res && [401, 403].includes(r1.res.status) && r2.res && [401, 403].includes(r2.res.status)) {
+    lines.push('Sunucuya ulaşılıyor ama anahtar kabul edilmiyor. Anahtarı kontrol et ya da yenile.');
+  } else if (r1.err && r2.err) {
+    lines.push('Sunucuya erişiliyor ancak istekler tarayıcı tarafından engelleniyor.',
+      'Servis tarafında CORS ayarının açılması gerekebilir (OPTIONS isteğine 200 dönmeli).');
+  } else {
+    lines.push('Sunucu yanıt verdi ama beklenmeyen bir durum var. Yukarıdaki HTTP kodlarını yöneticine ilet.');
+  }
+  paint();
+  const busy = document.querySelector('#modalBody .ai-busy'); if (busy) busy.remove();
 }
 
 async function askAI(messages, { json = false, maxTokens = 4000 } = {}) {
